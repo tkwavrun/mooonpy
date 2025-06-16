@@ -1,0 +1,13 @@
+[project]
+name = "mooonpy"
+version = "0.0.0"
+authors = [
+  { name="Josh Kemppainen", email="jdkemppa@mtu.edu" },
+]
+description = "AOT internal editable python package"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
