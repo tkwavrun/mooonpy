@@ -14,6 +14,8 @@ def hello_world() -> str:
 def greeter_msg(*, greeter: str) -> str:
     """
     Custom greeting
+    JOSH KEMPPAINEN auto-doc test
+
 
     :param greeter: name of a person who message will be from
     :type greeter: str
