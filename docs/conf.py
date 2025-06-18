@@ -7,18 +7,17 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 import sys
 import os
-sys.path.insert(0, os.path.abspath('../src'))
+sys.path.insert(0, os.path.abspath('../mooonpy'))
 
-
-project = 'MooonPy'
-copyright = '2025, Josh Kemppainen'
-author = 'Josh Kemppainen'
+project = 'mooonpy'
+copyright = '2025, Kemppainen-Muzzy'
+author = 'Josh Kemppainen, Tristan Muzzy'
 release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
