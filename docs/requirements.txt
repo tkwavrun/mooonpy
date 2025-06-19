@@ -1,4 +1,6 @@
 sphinx
 sphinx_rtd_theme
 sphinx-pdj-theme
+sphinx-book-theme
+pydata-sphinx-theme
 ghp-import
