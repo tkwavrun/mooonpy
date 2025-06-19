@@ -13,7 +13,13 @@ documentation for details.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents1:
+   
+   modules
+   
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents2:
    
    modules
 
