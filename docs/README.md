@@ -15,14 +15,14 @@ rebuilt from scratch, but these are mainly for Josh Kempppainen. Users and devel
    * Add this to top of conf.py
      - import sys
      - import os
-     - sys.path.insert(0, os.path.abspath('../mooonpy'))
+     - sys.path.insert(0, os.path.abspath('../'))
 
    * Change these in conf.py
      - change "extensions" to extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc']
      - change "html_theme" to html_theme = 'sphinx_rtd_theme'
 
 4. In mooonpy/
-   * sphinx-apidoc -o docs mooonpy
+   * sphinx-apidoc -o docs .
   
 5. In mooonpy/docs/
    * In index.rst 
