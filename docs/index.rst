@@ -23,6 +23,13 @@ documentation for details.
    
 .. toctree::
    :maxdepth: 2
-   :caption: High-level examples:
+   :caption: Examples:
    examples
+   
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
