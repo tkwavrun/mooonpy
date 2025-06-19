@@ -13,12 +13,6 @@ documentation for details.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Installation:
-
-   installing
-
-.. toctree::
-   :maxdepth: 2
    :caption: Packages:
    
    modules

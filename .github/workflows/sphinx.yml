@@ -50,7 +50,6 @@ jobs:
       #  2. regenenerate new .rst files
       - name: Regenerate docs/*.rst files
         run: |
-          find ./docs -type f -name "*.rst" ! -name "index.rst" -name "installing.rst" -delete
           sphinx-apidoc -f -o docs .
           
       # Build the new htm docs
