@@ -13,7 +13,7 @@ def hello_world() -> str:
 
 def greeter_msg(*, greeter: str) -> str:
     """
-    Custom greeting
+    Custom greeting\n
     JOSH KEMPPAINEN auto-doc test
 
 

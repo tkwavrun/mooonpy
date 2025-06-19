@@ -1,13 +1,21 @@
 [project]
 name = "mooonpy"
 version = "0.0.0"
-authors = [
-  { name="Josh Kemppainen", email="jdkemppa@mtu.edu" },
+authors = [{ name="Josh Kemppainen", email="jdkemppa@mtu.edu" },
+           { name="Tristan Muzzy", email="tristanmuz@gmail.com" },
 ]
-description = "AOT internal editable python package"
+
+dependencies = ["numpy>=1.0.0",
+                "scipy>=1.0.0",
+                "matplotlib>=3.0.0",
+                "sphinx>=8.0.0",
+                "sphinx_rtd_theme>=3.0.0",
+                "ghp-import>=2.0.0"
+]
+
+description = "mooonpy internal editable python package"
 readme = "README.md"
 requires-python = ">=3.7"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
+classifiers = ["Programming Language :: Python :: 3",
+               "Operating System :: OS Independent",
 ]
