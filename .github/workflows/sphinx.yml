@@ -50,14 +50,16 @@ jobs:
       #  2. regenenerate new .rst files
       - name: Regenerate docs/*.rst files
         run: |
-          find ./docs -type f -name "*.rst" ! -name "index.rst" -delete
+          cd docs/
+          make clean
+          find . -type f -name "*.rst" ! -name "index.rst" -delete
+          cd ../
           sphinx-apidoc -o docs .
           
       # Build the new htm docs
       - name: Build HTML
         run: |
           cd docs/
-          make clean
           make html
           
       # Push to gh-pages branch using (Python ghp-import)
