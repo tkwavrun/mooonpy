@@ -1,7 +1,4 @@
-Installation
-============
-
-How to install and use the theme
+How to install mooonpy using pip
 --------------------------------
 
 Install the ``mooonpy`` package (or add it to your ``requirements.txt`` file):
@@ -21,5 +18,5 @@ After mooonpy is installed you can load mooonpy as:
 
 .. note::
 
-   This is a place holder until mooonpy gets published to PyPi ``pip install mooonpy`` will not work
+   This is a place holder until mooonpy gets published to PyPi, so ``pip install mooonpy`` will not work!
 

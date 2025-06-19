@@ -14,18 +14,15 @@ documentation for details.
 .. toctree::
    :maxdepth: 2
    :caption: Installation:
-   
    installing
    
 .. toctree::
    :maxdepth: 2
    :caption: Manual:
-   
    mooonpy
    
 .. toctree::
    :maxdepth: 2
    :caption: High-level examples:
-   
    examples
 
