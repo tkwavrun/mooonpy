@@ -27,8 +27,7 @@ jobs:
     steps:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           # By default, checkout uses the GITHUB_TOKEN for authentication
           token: ${{ secrets.MY_API_TOKEN }}
@@ -50,7 +49,7 @@ jobs:
       #  2. regenenerate new .rst files
       - name: Regenerate docs/*.rst files
         run: |
-          sphinx-apidoc -f -o docs .
+          sphinx-apidoc -d 8 -f -o docs .
           
       # Build the new htm docs
       - name: Build HTML
