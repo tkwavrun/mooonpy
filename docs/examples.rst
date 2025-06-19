@@ -1,29 +1,15 @@
-examples package
-================
+Examples
+========
 
-Submodules
+Example: 1
 ----------
 
-examples.molspace\_and\_thermospace module
-------------------------------------------
+Generate a molecule object from .mol2 file and shift atoms:
 
-.. automodule:: examples.molspace_and_thermospace
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. code:: python
 
-examples.molspace\_examples1 module
------------------------------------
+    import mooonpy
+	
+    molecule = mooonpy.molspace('detda.mol2')
+    molecule.atoms.shift(x=5, y=10, z=30)
 
-.. automodule:: examples.molspace_examples1
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: examples
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -22,4 +22,10 @@ documentation for details.
    :caption: Manual:
    
    modules
+   
+.. toctree::
+   :maxdepth: 2
+   :caption: High-level examples:
+   
+   examples
 
