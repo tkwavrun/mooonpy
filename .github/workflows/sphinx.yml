@@ -50,7 +50,7 @@ jobs:
       - name: Regenerate docs/*.rst files
         run: |
           find ./docs -type f -name "*.rst" ! -name "index.rst" -delete
-          sphinx-apidoc -d 8 -f -o docs mooonpy
+          sphinx-apidoc -d 8 -f -o docs .
           
       # Build the new htm docs
       - name: Build HTML
