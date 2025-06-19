@@ -15,6 +15,8 @@ def greeter_msg(*, greeter: str) -> str:
     """
     Custom greeting\n
     JOSH KEMPPAINEN auto-doc test
+    
+    Moved requirements.txt to docs/ folder
 
 
     :param greeter: name of a person who message will be from
