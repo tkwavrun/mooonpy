@@ -21,7 +21,7 @@ documentation for details.
    :maxdepth: 2
    :caption: Manual:
    
-   modules
+   mooonpy
    
 .. toctree::
    :maxdepth: 2
