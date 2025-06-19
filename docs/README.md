@@ -14,7 +14,7 @@ rebuilt from scratch, but these are mainly for Josh Kempppainen. Users and devel
 3. In mooonpy/
    * sphinx-apidoc -o docs mooonpy
 
-4. In mooonpy/docs
+4. In mooonpy/docs/
    * Add this to top of conf.py
      - import sys
      - import os
@@ -27,5 +27,12 @@ rebuilt from scratch, but these are mainly for Josh Kempppainen. Users and devel
    * In index.rst 
      - add the "modules" keyword near bottom
    
-5. In mooonpy/docs
+5. In mooonpy/docs/
    * make html
+
+6. In mooonpy/docs/
+   * add requirements.txt for GitHub workflow to use adding:
+     - sphinx
+     - sphinx_rtd_theme
+     - ghp-import
+   * To allow for the .github/workflows/sphinx.yml file to install dependencies on a container
