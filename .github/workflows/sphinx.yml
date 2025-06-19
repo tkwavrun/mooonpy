@@ -44,11 +44,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r docs/requirements.txt
           
-      # Regenerate new .rst files
+      # Regenerate new .rst files:
+      #  1. delete old .rst files in ./docs (except index.rst)
+      #  2. regenenerate new .rst files
       - name: Regenerate docs/*.rst files
         run: |
           find ./docs -type f -name "*.rst" ! -name "index.rst" -delete
-          sphinx-apidoc -o docs mooonpy
+          sphinx-apidoc -d 8 -f -o docs mooonpy
           
       # Build the new htm docs
       - name: Build HTML
