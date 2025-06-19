@@ -27,7 +27,8 @@ jobs:
     steps:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           # By default, checkout uses the GITHUB_TOKEN for authentication
           token: ${{ secrets.MY_API_TOKEN }}
@@ -56,6 +57,7 @@ jobs:
       - name: Build HTML
         run: |
           cd docs/
+          clean make
           make html
           
       # Push to gh-pages branch using (Python ghp-import)

@@ -10,7 +10,6 @@ def hello_world() -> str:
     :return: Hello World
     :rtype: String
     """
-    print('HELLO!')
     return "hello world!! :) "
 
 
