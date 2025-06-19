@@ -11,3 +11,5 @@ class Molspace:
     """
     MOLSPACE DOC STRING
     """
+    def __init__(self):
+        self.filename = 'TESTING.EXT'
