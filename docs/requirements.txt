@@ -1,4 +1,5 @@
 sphinx
 sphinx_rtd_theme
+sphinx-pdj-theme
 pydata_sphinx_theme
 ghp-import
