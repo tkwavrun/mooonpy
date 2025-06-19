@@ -12,6 +12,13 @@ documentation for details.
 
 
 .. toctree::
+   :caption: Theme Documentation
+   :maxdepth: 2
+   :hidden:
+
+   installing
+
+.. toctree::
    :maxdepth: 2
    :caption: Contents:
    

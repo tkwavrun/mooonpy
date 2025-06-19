@@ -52,7 +52,7 @@ jobs:
         run: |
           cd docs/
           make clean
-          find . -type f -name "*.rst" ! -name "index.rst" -delete
+          find . -type f -name "*.rst" ! -name "index.rst" -name "installing.rst" -delete
           cd ../
           sphinx-apidoc -o docs .
           
