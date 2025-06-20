@@ -53,6 +53,7 @@ jobs:
       - name: Build HTML
         run: |
           cd docs/
+          make clean
           make html
           
       # Push to gh-pages branch using (Python ghp-import)

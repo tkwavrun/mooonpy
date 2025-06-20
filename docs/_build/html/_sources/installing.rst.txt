@@ -1,5 +1,5 @@
-installing using pip
---------------------
+using pip
+---------
 
 Install the ``mooonpy`` package (or add it to your ``requirements.txt`` file):
 

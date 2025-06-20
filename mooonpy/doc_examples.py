@@ -4,7 +4,10 @@ This module shows a few doc string examples for how
 to write doc strings for automatic Sphinx documentation.
 
 This module will eventually be deleted once all developers
-understand doc strings and the syntax for sphinx
+understand doc strings and the syntax for sphinx.
+
+The following is a good resource:
+    https://sphinx-rtd-tutorial.readthedocs.io/en/latest/docstrings.html
 """
 
 
