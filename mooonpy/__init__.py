@@ -2,5 +2,3 @@
 
 # Define the __all__ variable
 #__all__ = ['molspace', 'thermospace']
-
-from . molspace import *

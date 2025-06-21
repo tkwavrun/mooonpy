@@ -44,8 +44,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r docs/requirements.txt
           
+      # Clean old .rst files:
+      - name: Clean old docs/*.rst files
+        run: |
+          echo "Removing old *.rst files"
+          find ./docs -type f -name "*.rst" \
+          ! -name "index.rst" \
+          ! -name "installing.rst" \
+          ! -name "examples.rst" -delete
+          
       # Regenerate new .rst files:
-      - name: Regenerate docs/*.rst files
+      - name: Regenerate new docs/*.rst files
         run: |
           sphinx-apidoc -d 8 -f -o docs mooonpy
           

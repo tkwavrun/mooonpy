@@ -7,19 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   mooonpy.guis
    mooonpy.molspace
+   mooonpy.programs
    mooonpy.thermospace
-
-Submodules
-----------
-
-mooonpy.doc\_examples module
-----------------------------
-
-.. automodule:: mooonpy.doc_examples
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   mooonpy.tools
+   mooonpy.xrdspace
 
 Module contents
 ---------------
