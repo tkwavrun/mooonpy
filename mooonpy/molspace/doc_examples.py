@@ -8,6 +8,7 @@ understand doc strings and the syntax for sphinx.
 
 The following is a good resources
     https://sphinx-rtd-tutorial.readthedocs.io/en/latest/docstrings.html
+    
     https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html
 """
 
