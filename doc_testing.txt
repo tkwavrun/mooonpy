@@ -1,9 +1,0 @@
-find . -name "*.rst" -type f
-find . -name "*.rst" -type f -delete
-
-
-find . -type f -name "*.rst" ! -name "index.rst" ! -name "install.rst"
-
-
-# Delete all .rst files before regenerating them, except the index.rst
-find ./docs -type f -name "*.rst" ! -name "index.rst" -delete

@@ -21,15 +21,22 @@ Example Directory:
   
   .. code:: console
   
-    mooonpy/src$ pwd
-    GitHub/mooonpy/src
+    mooonpy$ pwd
+    GitHub/mooonpy
   
-    mooonpy/src$ ls
+    mooonpy$ ls
     mooonpy
   
-    mooonpy/src$ tree -L 1
+    mooonpy$ tree -L 1
     .
-    └── mooonpy
+    ├── LICENCE
+    ├── README.md
+    ├── doc_testing.txt
+    ├── docs
+    ├── examples
+    ├── pyproject.toml
+    ├── src
+    └── tests
   
 
 Windows OS:
