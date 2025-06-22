@@ -24,9 +24,10 @@ extensions = ['sphinx.ext.todo',
 ]
 
 todo_include_todos = True
+add_module_names = False
 
-autodoc_default_options = {"module-name": False  # hides module paths in signatures
-}
+#autodoc_default_options = {"module-name": False  # hides module paths in signatures
+#}
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
