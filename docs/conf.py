@@ -24,7 +24,7 @@ extensions = ['sphinx.ext.todo',
 ]
 
 todo_include_todos = True
-add_module_names = False
+add_module_names = True
 
 #autodoc_default_options = {"module-name": False  # hides module paths in signatures
 #}
