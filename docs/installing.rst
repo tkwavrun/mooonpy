@@ -15,27 +15,21 @@ Install the ``mooonpy`` package (or add it to your ``requirements.txt`` file):
 Using pip locally
 -----------------
 
-Install the ``mooonpy`` package locally in mooonpy base directory:
+Install the ``mooonpy`` package locally in mooonpy/src/ directory:
 
 Example Directory:
   
   .. code:: console
   
-    mooonpy$ pwd
-    GitHub/mooonpy
+    mooonpy/src$ pwd
+    GitHub/mooonpy/src
   
-    mooonpy$ ls
-    LICENCE  README.md  docs  examples  mooonpy pyproject.toml  tests
+    mooonpy/src$ ls
+    mooonpy
   
-    mooonpy$ tree -L 1
+    mooonpy/src$ tree -L 1
     .
-    ├── LICENCE
-    ├── README.md
-    ├── docs
-    ├── examples
-    ├── mooonpy
-    ├── pyproject.toml
-    └── tests
+    └── mooonpy
   
 
 Windows OS:
