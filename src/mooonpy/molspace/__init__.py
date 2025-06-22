@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
+import importlib
 
-# Import the submodules
-from .molspace import Molspace as Molspace
-#Molspace.__module__ = "mypackage.api"
+__all__ = ['atoms',
+           'box',
+           'doc_examples',
+           'graph_theory',
+           'hw',
+           'hw_2',
+           'lmp_styles',
+           'mc',
+           'molspace',
+]
+
+for name in __all__:
+    module = importlib.import_module(f'.{name}', __package__)
+    globals()[name] = module
