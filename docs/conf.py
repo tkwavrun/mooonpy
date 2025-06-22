@@ -20,8 +20,13 @@ release = '0.0.0'
 extensions = ['sphinx.ext.todo',
               'sphinx.ext.viewcode',
               'sphinx.ext.autodoc',
-              'matplotlib.sphinxext.plot_directive']
+              'matplotlib.sphinxext.plot_directive'
+]
+
 todo_include_todos = True
+
+autodoc_default_options = {"module-name": False  # hides module paths in signatures
+}
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
