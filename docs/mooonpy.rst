@@ -1,6 +1,11 @@
 mooonpy package
 ===============
 
+.. automodule:: mooonpy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -13,11 +18,3 @@ Subpackages
    mooonpy.thermospace
    mooonpy.tools
    mooonpy.xrdspace
-
-Module contents
----------------
-
-.. automodule:: mooonpy
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -13,7 +13,7 @@ find . -type f -name "*.rst" \
 ! -name "examples.rst" -delete
 
 cd ../
-sphinx-apidoc -o docs .
+sphinx-apidoc --force --no-toc --separate --module-first -o docs .
 cd docs/
 
 make clean

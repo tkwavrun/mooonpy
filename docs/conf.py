@@ -17,7 +17,10 @@ release = '0.0.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc']
+extensions = ['sphinx.ext.todo',
+              'sphinx.ext.viewcode',
+              'sphinx.ext.autodoc',
+              'matplotlib.sphinxext.plot_directive']
 todo_include_todos = True
 
 templates_path = ['_templates']

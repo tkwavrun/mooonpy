@@ -1,21 +1,15 @@
 mooonpy.programs package
 ========================
 
-Submodules
-----------
-
-mooonpy.programs.hw module
---------------------------
-
-.. automodule:: mooonpy.programs.hw
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
 .. automodule:: mooonpy.programs
    :members:
    :undoc-members:
    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mooonpy.programs.hw

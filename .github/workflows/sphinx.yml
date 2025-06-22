@@ -56,7 +56,7 @@ jobs:
       # Regenerate new .rst files:
       - name: Regenerate new docs/*.rst files
         run: |
-          sphinx-apidoc -d 8 -f -o docs mooonpy
+          sphinx-apidoc --force --no-toc --separate --module-first -d 8 -o docs mooonpy
           
       # Build the new htm docs
       - name: Build HTML
