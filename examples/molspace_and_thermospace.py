@@ -14,6 +14,9 @@ import mooonpy
 print(mooonpy.molspace.molspace.Molspace())
 print(mooonpy.Molspace())
 
+print(mooonpy.molspace.doc_examples.add(1,3))
+print(mooonpy.DocExamples.add(1,3))
+
 
 #print('full : ', mooonpy) #.doc_examples.add(1, 2))
 #print('alias: ', ms.hw.hello_world())

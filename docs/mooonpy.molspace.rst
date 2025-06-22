@@ -6,6 +6,14 @@ mooonpy.molspace package
    :undoc-members:
    :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mooonpy.molspace.graph_theory
+
 Submodules
 ----------
 
