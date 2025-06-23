@@ -26,8 +26,11 @@ extensions = ['sphinx.ext.todo',
 todo_include_todos = True
 add_module_names = True
 
-#autodoc_default_options = {"module-name": False  # hides module paths in signatures
-#}
+# Control how Sphinx documents class docstrings
+#  'class' -> Only documents top of class and methods
+#  'init'  -> Only documents __init__
+#  'both'  -> Documents top of class, methods, and __init__
+autoclass_content = 'both'
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
