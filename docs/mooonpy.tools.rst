@@ -12,4 +12,5 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   mooonpy.tools.file_utils
    mooonpy.tools.hw

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+from . import _files_io as _files_io
+from .atoms import Atoms
+from .topology import Bonds, Angles, Dihedrals, Impropers
+from .force_field import ForceField
+import os
 
 
-
-class Molspace:
+class Molspace(object):
     """
     Initializes a Molspace instance
     -------------------------------
@@ -11,7 +15,7 @@ class Molspace:
       * Full namespace syntax    : ``mooonpy.molspace.molspace.Molspace()``
       * Aliased namespace syntax : ``mooonpy.Molspace()``
     """
-    def __init__(self, filename=''):
+    def __init__(self, filename='', **kwargs):
         """        
         Initialization Parameters
         -------------------------
@@ -48,6 +52,35 @@ class Molspace:
             matrix is ``2*N``, with `N` the number of biquad sections
             of the desired system.
         """
+        # Build this object with some composition
+        self.atoms: Atoms = Atoms()
+        self.bonds: Bonds = Bonds()
+        self.angles: Angles = Angles()
+        self.dihedrals: Dihedrals = Dihedrals()
+        self.impropers: Impropers = Impropers()
+        self.ff: ForceField = ForceField()
+
+        # Handle file initilaizations
         self.filename = filename
+        self.header = ''
+        if filename:
+            if os.path.exists(filename):
+                self.read_files(filename, kwargs)
+            else:
+                raise FileNotFoundError(f'{filename} was not found or is a directory')
+        
+
+        
+    def read_files(self, filename, kwargs):
+        root, ext = os.path.splitext(filename)
+        defaults = {'read':'mooonpy', 'sections':('Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities')}
+        config = {**defaults, **kwargs}
+        if filename.endswith('.data'):
+            if config['read'] == 'mooonpy':
+                _files_io.read_lmp_data.read(self, filename, config)
+            else:
+                m = _files_io.read_lmp.Molecule_File(filename, method='forward', sections=defaults['sections'])
+            
+        return None
         
         

@@ -11,11 +11,11 @@ import mooonpy
 #from mooonpy import molspace as ms
 #from mooonpy import thermospace as ts
 
-print(mooonpy.molspace.molspace.Molspace())
-print(mooonpy.Molspace())
+# print(mooonpy.molspace.molspace.Molspace())
+# print(mooonpy.Molspace())
 
-print(mooonpy.molspace.doc_examples.add(1,3))
-print(mooonpy.DocExamples.add(1,3))
+# print(mooonpy.molspace.doc_examples.add(1,3))
+# print(mooonpy.DocExamples.add(1,3))
 
 
 #print('full : ', mooonpy) #.doc_examples.add(1, 2))
@@ -24,3 +24,41 @@ print(mooonpy.DocExamples.add(1,3))
 
 #print('full : ', mooonpy.thermospace.multiply(x=5, y=10))
 #print('alias: ',  ts.lw.multiply(x=5, y=10))
+
+
+file = 'EPON_862/all2lmp_Outputs/detda_typed_IFF.data'
+#file = 'EPON_862/detda_typed_IFF_merged.data'
+
+#file = 'EPON_862/Cellulose-supercell_morse_IFF.data'
+#file = 'EPON_862/system1_cell_replicate.data'
+
+molecule = mooonpy.Molspace(filename=file)
+
+
+
+# if __name__ == '__main__':
+#     import timeit
+    
+#     file = 'EPON_862/detda_typed_IFF_merged.data'
+#     file = 'EPON_862/system1_cell_replicate.data'
+#     def call_mooonpy():
+#         mooonpy.Molspace(filename=file, read='mooonpy')
+    
+#     def call_lunar():
+#         mooonpy.Molspace(filename=file, read='lunar')    
+    
+#     number = 1
+#     print('\n\n')
+#     mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
+#     print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
+    
+#     print('\n\n')
+#     lunar_time = timeit.timeit(stmt=call_lunar, number=number)
+#     print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
+    
+    
+
+    
+
+        
+        

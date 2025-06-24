@@ -28,3 +28,4 @@ Submodules
    mooonpy.molspace.lmp_styles
    mooonpy.molspace.mc
    mooonpy.molspace.molspace
+   mooonpy.molspace.topology
