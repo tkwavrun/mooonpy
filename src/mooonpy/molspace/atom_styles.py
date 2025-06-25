@@ -39,7 +39,7 @@ class Styles:
         
         self.read['_random']     = (str,       str,       str,    int,   int,   int)
         self.styles['_random']   = ('comment', 'element', 'name', 'vx', 'vy',  'vz')
-        self.defaults['_random'] = ('',        '',        '',      0,    0,     0)
+        self.defaults['_random'] = ('',        '_default',        '',      0,    0,     0)
 
         
         # Consolidate all attrs and defaults into a dict and tuple to 
@@ -69,4 +69,8 @@ class Styles:
             value = func(string)
             setattr(atom, attr, value)
         return
+    
+    def read_full(self, atom, style, data_lst):
+        atom.element = 'full'
+        return 
 

@@ -26,16 +26,19 @@ def read(mol, filename, config):
     sections_kwargs: set[str] = set(config['sections'])
     
     
-    # Find "hard coded" atom style reads for performance
-    hard_coded_atom_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('atoms_')}
-    
-    
     # Create shortcuts to all the generation factories for speed and ease of use
     atom_factory = mol.atoms.styles.gen_atom
     bond_factory = mol.bonds.gen_bond()
     angle_factory = mol.angles.gen_angle()
     dihedral_factory = mol.dihedrals.gen_dihedral()
     improper_factory = mol.impropers.gen_improper()
+    
+        
+    # Find "hard coded" atom style reads for performance and set atom_reader to slow and update later on
+    hard_coded_atom_reading_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('read_')}
+    atom_reader = mol.atoms.styles.fill_atom
+    print(hard_coded_atom_reading_styles)
+    
     
     
     # Open and read contents from file
@@ -80,7 +83,7 @@ def read(mol, filename, config):
             #-------------------------------------------------------#
             if section == 'Atoms':
                 atom = atom_factory() #mol.atoms.styles.gen_atom()
-                mol.atoms.styles.fill_atom(atom, mol.atoms.style, data_lst)
+                atom_reader(atom, mol.atoms.style, data_lst)
                 mol.atoms[atom.id] = atom
                 
             elif section == 'Bonds':
@@ -207,8 +210,13 @@ def read(mol, filename, config):
                 # that section read or not (if not set section to '', to skip reading that section)
                 if section == 'Atoms':
                     mol.atoms.style = comment
-                    if 'Atoms' not in sections_kwargs:
-                        section = ''
+                    if 'Atoms' not in sections_kwargs: section = ''
+                    
+                    # Update atom reader to a quicker one (if supported)
+                    if mol.atoms.style in hard_coded_atom_reading_styles:
+                        reader_name = hard_coded_atom_reading_styles[mol.atoms.style]
+                        atom_reader = getattr(mol.atoms.styles, reader_name)
+
                 elif section == 'Bonds' and 'Bonds' not in sections_kwargs:
                     section = ''
                 elif section == 'Angles' and 'Angles' not in sections_kwargs:
@@ -293,65 +301,67 @@ def read(mol, filename, config):
 
             
 
-    
-    # print('\n\n\nSTYLES:')
-    # print('header: ', mol.header[:50])
-    # print('atom style: ', mol.atoms.style)
-    # print('xbox: ', mol.atoms.box.xlo, mol.atoms.box.xhi)
-    # print('ybox: ', mol.atoms.box.ylo, mol.atoms.box.yhi)
-    # print('zbox: ', mol.atoms.box.zlo, mol.atoms.box.zhi)
-    # print('tilt: ', mol.atoms.box.xy, mol.atoms.box.xz, mol.atoms.box.yz)
-    # print('natoms: ', len(mol.atoms))
-    # print('nbonds: ', len(mol.bonds))
-    # print('nangles: ', len(mol.angles))
-    # print('ndihedrals: ', len(mol.dihedrals))
-    # print('nimpropers: ', len(mol.impropers))
-    
-    # print('\n\nAtoms')
-    # for n, (key, value) in enumerate(mol.atoms.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.x, value.y, value.z, value.comment)
-    # # line = mol.atoms.styles.gen_line(mol.atoms[1], style='body')
-    # # print(line)
-    
-    # print('\n\nBonds')
-    # for n, (key, value) in enumerate(mol.bonds.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-            
-    # print('\n\nAngles')
-    # for n, (key, value) in enumerate(mol.angles.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-            
-    # print('\n\nDihedrals')
-    # for n, (key, value) in enumerate(mol.dihedrals.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-            
-    # print('\n\nImpropers')
-    # for n, (key, value) in enumerate(mol.impropers.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-    
-    # d = mol.ff.masses
-    # # d = mol.ff.pair_coeffs
-    # # d = mol.ff.bond_coeffs
-    # # d = mol.ff.angle_coeffs
-    # # d = mol.ff.dihedral_coeffs
-    # # d = mol.ff.improper_coeffs
-    # # d = mol.ff.bondbond_coeffs
-    # # d = mol.ff.bondangle_coeffs
-    # # d = mol.ff.angleangletorsion_coeffs
-    # # d = mol.ff.endbondtorsion_coeffs
-    # # d = mol.ff.middlebondtorsion_coeffs
-    # # d = mol.ff.bondbond13_coeffs
-    # # d = mol.ff.angletorsion_coeffs
-    # # d = mol.ff.angleangle_coeffs
-    # print('\n\nFF-CHECK: ', d.style)
-    # for key, value in d.items():
-    #     print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
+    print_info = False
+    #print_info = True
+    if print_info:
+        print('\n\n\nSTYLES:')
+        print('header: ', mol.header[:50])
+        print('atom style: ', mol.atoms.style)
+        print('xbox: ', mol.atoms.box.xlo, mol.atoms.box.xhi)
+        print('ybox: ', mol.atoms.box.ylo, mol.atoms.box.yhi)
+        print('zbox: ', mol.atoms.box.zlo, mol.atoms.box.zhi)
+        print('tilt: ', mol.atoms.box.xy, mol.atoms.box.xz, mol.atoms.box.yz)
+        print('natoms: ', len(mol.atoms))
+        print('nbonds: ', len(mol.bonds))
+        print('nangles: ', len(mol.angles))
+        print('ndihedrals: ', len(mol.dihedrals))
+        print('nimpropers: ', len(mol.impropers))
         
+        print('\n\nAtoms')
+        for n, (key, value) in enumerate(mol.atoms.items()):
+            if n < 5:
+                print(key, value.type, value.x, value.y, value.z, value.comment, value.element)
+        # line = mol.atoms.styles.gen_line(mol.atoms[1], style='body')
+        # print(line)
+        
+        print('\n\nBonds')
+        for n, (key, value) in enumerate(mol.bonds.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.bo, value.comment)
+                
+        print('\n\nAngles')
+        for n, (key, value) in enumerate(mol.angles.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.bo, value.comment)
+                
+        print('\n\nDihedrals')
+        for n, (key, value) in enumerate(mol.dihedrals.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.bo, value.comment)
+                
+        print('\n\nImpropers')
+        for n, (key, value) in enumerate(mol.impropers.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.bo, value.comment)
+        
+        d = mol.ff.masses
+        # d = mol.ff.pair_coeffs
+        # d = mol.ff.bond_coeffs
+        # d = mol.ff.angle_coeffs
+        # d = mol.ff.dihedral_coeffs
+        # d = mol.ff.improper_coeffs
+        # d = mol.ff.bondbond_coeffs
+        # d = mol.ff.bondangle_coeffs
+        # d = mol.ff.angleangletorsion_coeffs
+        # d = mol.ff.endbondtorsion_coeffs
+        # d = mol.ff.middlebondtorsion_coeffs
+        # d = mol.ff.bondbond13_coeffs
+        # d = mol.ff.angletorsion_coeffs
+        # d = mol.ff.angleangle_coeffs
+        print('\n\nFF-CHECK: ', d.style)
+        for key, value in d.items():
+            print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
+            
 
             
 
