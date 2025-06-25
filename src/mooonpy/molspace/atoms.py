@@ -8,13 +8,13 @@ from .atom_styles import Styles
 
 
 class Atoms(dict):    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.style: str = 'full' # will default to full and update when needed
         
         # Build this object with some composition
         self.box: Box = Box()
-        self.styles: Styles = Styles(**kwargs)
+        self.styles: Styles = Styles()
         
         
     def shift(self, sx=0, sy=0, sz=0):

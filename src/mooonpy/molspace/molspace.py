@@ -54,12 +54,12 @@ class Molspace(object):
         """
         
         # Build this object with some composition
-        self.atoms: Atoms = Atoms(**kwargs)
-        self.bonds: Bonds = Bonds(**kwargs)
-        self.angles: Angles = Angles(**kwargs)
-        self.dihedrals: Dihedrals = Dihedrals(**kwargs)
-        self.impropers: Impropers = Impropers(**kwargs)
-        self.ff: ForceField = ForceField(**kwargs)
+        self.atoms: Atoms = Atoms()
+        self.bonds: Bonds = Bonds()
+        self.angles: Angles = Angles()
+        self.dihedrals: Dihedrals = Dihedrals()
+        self.impropers: Impropers = Impropers()
+        self.ff: ForceField = ForceField()
 
         # Handle file initilaizations
         self.filename = filename
@@ -73,14 +73,21 @@ class Molspace(object):
 
         
     def read_files(self, filename, **kwargs):
+
+        
         root, ext = os.path.splitext(filename)
         defaults = {'read':'mooonpy', 'sections':('Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities')}
-        config = {**defaults, **kwargs}
+        config = {**defaults, **kwargs}        
         if filename.endswith('.data'):
-            if config['read'] == 'mooonpy':
-                _files_io.read_lmp_data.read(self, filename, config)
+            if 'data_sections' in kwargs:
+                sections = kwargs['data_sections']
             else:
-                m = _files_io.read_lmp.Molecule_File(filename, method='forward', sections=defaults['sections'])
+                sections = ('Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities')
+            
+            if config['read'] == 'mooonpy':
+                _files_io.read_lmp_data.read(self, filename, sections)
+            else:
+                _files_io.read_lmp.Molecule_File(filename, method='forward', sections=sections)
             
         return None
         

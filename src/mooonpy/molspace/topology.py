@@ -19,8 +19,9 @@ def make_class(class_name, slots, defaults=None):
         
         
 class Bonds(dict):    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.style: str = ''
         
     def gen_bond(self):
         class_name = 'Bond'
@@ -32,8 +33,9 @@ class Bonds(dict):
     
     
 class Angles(dict):    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.style: str = ''
         
     def gen_angle(self):
         class_name = 'Angle'
@@ -45,8 +47,9 @@ class Angles(dict):
 
 
 class Dihedrals(dict):    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.style: str = ''
         
     def gen_dihedral(self):
         class_name = 'Dihedral'
@@ -58,8 +61,9 @@ class Dihedrals(dict):
 
 
 class Impropers(dict):    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.style: str = ''
         
     def gen_improper(self):
         class_name = 'Improper'

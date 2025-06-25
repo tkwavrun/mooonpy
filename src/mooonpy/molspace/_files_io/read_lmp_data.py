@@ -8,7 +8,7 @@ from ...tools import file_utils
 
 
 
-def read(mol, filename, config):
+def read(mol, filename, sections):
     
     # Define sections to read (using inputs from user if they pass them)
     sections_mp:    list[str] = ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities', 'Ellipsoids', 'Lines', 'Triangles', 'Bodies']
@@ -21,7 +21,7 @@ def read(mol, filename, config):
     # Setup the sets that will be used for parsing
     sections_all:    set[str] = set(sections_mp + sections_tl + sections_ff + sections_xt + sections_fixes)
     sections_coeffs: set[str] = sections_ff + sections_xt
-    sections_kwargs: set[str] = set(config['sections'])
+    sections_kwargs: set[str] = set(sections)
     
     
     # Create shortcuts to all the generation factories for speed and ease of use
@@ -79,8 +79,8 @@ def read(mol, filename, config):
             #-------------------------------------------------------#
             if section == 'Atoms':
                 atom = atom_factory() #mol.atoms.styles.gen_atom()
-                atom.comment = comment
                 atom_reader(atom, mol.atoms.style, data_lst)
+                atom.comment = comment
                 mol.atoms[atom.id] = atom
                 
             elif section == 'Bonds':
@@ -299,7 +299,7 @@ def read(mol, filename, config):
             
 
     print_info = False
-    #print_info = True
+    print_info = True
     if print_info:
         print('\n\n\nSTYLES:')
         print('header: ', mol.header[:50])
@@ -329,17 +329,17 @@ def read(mol, filename, config):
         print('\n\nAngles')
         for n, (key, value) in enumerate(mol.angles.items()):
             if n < 5:
-                print(key, value.type, value.ordered, value.bo, value.comment)
+                print(key, value.type, value.ordered, value.comment)
                 
         print('\n\nDihedrals')
         for n, (key, value) in enumerate(mol.dihedrals.items()):
             if n < 5:
-                print(key, value.type, value.ordered, value.bo, value.comment)
+                print(key, value.type, value.ordered, value.comment)
                 
         print('\n\nImpropers')
         for n, (key, value) in enumerate(mol.impropers.items()):
             if n < 5:
-                print(key, value.type, value.ordered, value.bo, value.comment)
+                print(key, value.type, value.ordered, value.comment)
         
         d = mol.ff.masses
         # d = mol.ff.pair_coeffs

@@ -23,6 +23,7 @@ def int_str(string):
 
 class Styles:
     def __init__(self, **kwargs):
+        
         # Set up supported styles for LAMMPS and other file formats (NOTE: for LAMMPS 'type' attributes
         # these can be an int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file).        
         self.read = {}     # {'style' : (int or float or str)}     -> (int or float or str) sets how to read string
@@ -70,27 +71,30 @@ class Styles:
         self.defaults['custom']        = ()
         
         
-        # Setup which styles should be built when an atom is generated
-        if 'astyles' in kwargs:
-            astyles = kwargs['astyles']
-            if isinstance(astyles, (tuple, list)):
-                build = tuple(astyles)
-            else:
-                build = tuple([kwargs['astyles']])
-        else:
-            build = ('all', )
+        # # Setup which styles should be built when an atom is generated
+        # if 'astyles' in kwargs:
+        #     astyles = kwargs['astyles']
+        #     if isinstance(astyles, (tuple, list)):
+        #         build = tuple(astyles)
+        #     else:
+        #         build = tuple([kwargs['astyles']])
+        # else:
+        #     build = ('all', )
 
         
         # Consolidate all attrs and defaults into a dict and tuple to 
         # be able to initialize an Atom() object as quickly as possible
         self.all_defaults = {} # {'attr-name':default-value}
         for style in self.styles:
-            if style in build or 'all' in build or style == '_random':
-                attrs = self.styles[style]
-                defaults = self.defaults[style]
-                for attr, default in zip(attrs, defaults):
-                    self.all_defaults[attr] = default
+            # if style in build or 'all' in build or style == '_random':
+            #     print('Building style: ', style)
+            attrs = self.styles[style]
+            defaults = self.defaults[style]
+            for attr, default in zip(attrs, defaults):
+                self.all_defaults[attr] = default
         self.all_per_atom = tuple(self.all_defaults.keys())
+        # print('self.all_per_atom = ', self.all_per_atom)
+        # print('self.all_defaults = ', self.all_defaults)
         
         
     def update_build(self, astyles):
@@ -116,7 +120,7 @@ class Styles:
         for string, attr, func in zip(data_lst, order, read):
             value = func(string)
             setattr(atom, attr, value)
-        return
+        return atom
     
     def read_full(self, atom, style, data_lst):
         atom.id = int(data_lst[0])
@@ -129,4 +133,4 @@ class Styles:
         atom.ix = int(data_lst[7])
         atom.iy = int(data_lst[8])
         atom.iz = int(data_lst[9])
-        return 
+        return atom
