@@ -30,56 +30,12 @@ def read(mol, filename, config):
     hard_coded_atom_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('atoms_')}
     
     
-        # self.lammps = {'full':         ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
-        #                'charge':       ('id', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
-        #                'body':         ('id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
-        #                'custom':       ()}
-        
-        # self.other = {'xyz':          ('element', 'x', 'y', 'z'),
-        #               'mol2':         ('ID', 'element', 'x', 'y', 'z', 'element', 'molid', 'name', 'q')}
-    
-    
-    # Per-atom and per-bond, angle, ... can be generated with each instance as:
-    #  - mol.atoms.styles.gen_atom()
-    #  - mol.bonds.gen_bond()
-    #  - mol.angles.gen_bond()
-    #  - mol.dihedrals.gen_bond()
-    #  - mol.impropers.gen_bond()
-    # but is slow due to class structure. Using these "pre-built local" versions
-    # of *.gen_*() significantly improves performance.
-    class Atom:
-        __slots__ = mol.atoms.styles.all_per_atom
-        def __init__(self):
-            self.q: float = 0.0
-            # self.x: float = 0.0
-            # self.y: float = 0.0
-            # self.z: float = 0.0            
-            # self.vx: float = 0.0
-            # self.vy: float = 0.0
-            # self.vz: float = 0.0
-            # self.mass: float = 0.0
-            # #self.ccN: float = 0.0
-            # #self.cradius: float = 0.0
-            
-            # self.ix: int = 0
-            # self.iy: int = 0
-            # self.iz: int = 0
-            # self.type: int = 0
-            # self.molid: int = 0
-            # self.bodyflag: int = 0
-            
-            # self.comment: str = ''
-            # self.element: str = ''
-            
-    class Nbody():  
-        __slots__ = ('bo', 'type', 'ordered', 'comment')
-        def __init__(self):
-            self.bo: float = 0.0
-            self.type: int = 0
-            self.ordered: list[int] = []
-            self.comment: str = ''
-    
-    atom_factory = mol.atoms.gen_atom
+    # Create shortcuts to all the generation factories for speed and ease of use
+    atom_factory = mol.atoms.styles.gen_atom
+    bond_factory = mol.bonds.gen_bond()
+    angle_factory = mol.angles.gen_angle()
+    dihedral_factory = mol.dihedrals.gen_dihedral()
+    improper_factory = mol.impropers.gen_improper()
     
     
     # Open and read contents from file
@@ -123,93 +79,9 @@ def read(mol, filename, config):
             #    the entire strech of the large sections            #
             #-------------------------------------------------------#
             if section == 'Atoms':
-                # if mol.atoms.style in hard_coded_atom_styles:
-                #     atom = getattr(mol.atoms.styles, hard_coded_atom_styles[mol.atoms.style])(data_lst)
-                # else:
-                #     atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
-                # #atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
-                # atom.comment = comment
-                # mol.atoms[atom.id] = atom
-                
-                # print()
-                # print(n)
-                
-                # def gen():
-                #     atom = Atom() 
-                #     #atom = mol.atoms.styles.gen_atom()
-                #     #atom = type('Atom', (), {'__slots__': ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz')})
-                
-                # def parse():
-                #     id = int(data_lst[0])
-                #     molid = int(data_lst[1])
-                #     type = int(data_lst[2])
-                #     q = float(data_lst[3])
-                #     x = float(data_lst[4])
-                #     y = float(data_lst[5])
-                #     z = float(data_lst[6])
-                #     try:
-                #         ix = int(data_lst[7])
-                #         iy = int(data_lst[8])
-                #         iz = int(data_lst[9])
-                #     except:
-                #         ix = 0
-                #         iy = 0
-                #         iz = 0
-                    
-                # number = 100_000
-                # gen_time = timeit.timeit(stmt=gen, number=number)
-                # parse_time = timeit.timeit(stmt=parse, number=number)
-                # print('gen time: ', gen_time)
-                # print('parse time: ', parse_time)
-                
-                
-                # atom = mol.atoms.gen_atom()
-                # if mol.atoms.style == 'full':
-                #     atom.id = int(data_lst[0])
-                #     atom.molid = int(data_lst[1])
-                #     atom.type = int(data_lst[2])
-                #     atom.q = float(data_lst[3])
-                #     atom.x = float(data_lst[4])
-                #     atom.y = float(data_lst[5])
-                #     atom.z = float(data_lst[6])
-                #     try:
-                #         atom.ix = int(data_lst[7])
-                #         atom.iy = int(data_lst[8])
-                #         atom.iz = int(data_lst[9])
-                #     except:
-                #         atom.ix = 0
-                #         atom.iy = 0
-                #         atom.iz = 0
-                #     atom.comment = comment
-                #     mol.atoms[atom.id] = atom
-                # else:
-                #     atom = mol.atoms.fill_atom(atom, mol.atoms.style, data_lst)
-                #     atom.comment = comment
-                #     mol.atoms[atom.id] = atom
-                
-                
-                
-                #atom = mol.atoms.gen_atom()
-                atom = Atom() 
-                #atom = atom_factory()
-                atom.id = int(data_lst[0])
-                atom.molid = int(data_lst[1])
-                atom.type = int(data_lst[2])
-                atom.q = float(data_lst[3])
-                atom.x = float(data_lst[4])
-                atom.y = float(data_lst[5])
-                atom.z = float(data_lst[6])
-                try:
-                    atom.ix = int(data_lst[7])
-                    atom.iy = int(data_lst[8])
-                    atom.iz = int(data_lst[9])
-                except:
-                    atom.ix = 0
-                    atom.iy = 0
-                    atom.iz = 0
-                atom.comment = comment
+                atom = atom_factory() #mol.atoms.styles.gen_atom()
+                mol.atoms.styles.fill_atom(atom, mol.atoms.style, data_lst)
                 mol.atoms[atom.id] = atom
-                pass
                 
             elif section == 'Bonds':
                 #ID = int(data_lst[0])
@@ -217,7 +89,7 @@ def read(mol, filename, config):
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 
-                bond = Nbody() #mol.bonds.gen_bond()
+                bond = bond_factory #mol.bonds.gen_bond()
                 bond.ordered = [id1, id2]
                 bond.comment = comment
                 bond.type = typeID
@@ -230,7 +102,7 @@ def read(mol, filename, config):
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
                 
-                angle = Nbody() #mol.angles.gen_angle()
+                angle = angle_factory #mol.angles.gen_angle()
                 angle.ordered = [id1, id2, id3]
                 angle.comment = comment
                 angle.type = typeID
@@ -244,7 +116,7 @@ def read(mol, filename, config):
                 id3 = int(data_lst[4])
                 id4 = int(data_lst[5])
                 
-                dihedral = Nbody() #mol.dihedrals.gen_dihedral()
+                dihedral = dihedral_factory #mol.dihedrals.gen_dihedral()
                 dihedral.ordered = [id1, id2, id3, id4]
                 dihedral.comment = comment
                 dihedral.type = typeID
@@ -258,7 +130,7 @@ def read(mol, filename, config):
                 id3 = int(data_lst[4])
                 id4 = int(data_lst[5])
                 
-                improper = Nbody() #mol.impropers.gen_improper()
+                improper = improper_factory #mol.impropers.gen_improper()
                 improper.ordered = [id1, id2, id3, id4]
                 improper.comment = comment
                 improper.type = typeID
