@@ -36,25 +36,25 @@ molecule = mooonpy.Molspace(filename=file)
 
 
 
-# if __name__ == '__main__':
-#     import timeit
+if __name__ == '__main__':
+    import timeit
     
-#     file = 'EPON_862/detda_typed_IFF_merged.data'
-#     file = 'EPON_862/system1_cell_replicate.data'
-#     def call_mooonpy():
-#         mooonpy.Molspace(filename=file, read='mooonpy')
+    file = 'EPON_862/detda_typed_IFF_merged.data'
+    file = 'EPON_862/system1_cell_replicate.data'
+    def call_mooonpy():
+        mooonpy.Molspace(filename=file, read='mooonpy')
     
-#     def call_lunar():
-#         mooonpy.Molspace(filename=file, read='lunar')    
+    def call_lunar():
+        mooonpy.Molspace(filename=file, read='lunar')    
     
-#     number = 1
-#     print('\n\n')
-#     mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
-#     print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
+    number = 1
+    print('\n\n')
+    mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
+    print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
     
-#     print('\n\n')
-#     lunar_time = timeit.timeit(stmt=call_lunar, number=number)
-#     print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
+    print('\n\n')
+    lunar_time = timeit.timeit(stmt=call_lunar, number=number)
+    print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
     
     
 

@@ -19,12 +19,14 @@ class Styles:
         
         
         # Get all per-atom attributes from both lammps and other atom styles
-        self.all_per_atom = set(['comment']) # we will want to be able to have a comment
+        self.all_per_atom = set(['comment', 'vx', 'vy', 'vz']) # we will want to be able to have a comment and velocities
         for style in self.lammps:
             self.all_per_atom.update( set(self.lammps[style]) )
         for style in self.other:
             self.all_per_atom.update( set(self.other[style]) )
         self.all_per_atom = tuple(self.all_per_atom)
+        
+        self.all_per_atom = ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz', 'comment')
         
         
         # Generate how to read/write each per-atom attribute and set default
@@ -32,11 +34,41 @@ class Styles:
         self.per_atom = {'id':           {'read':    self.read_int,
                                           'default': self.read_int(0)},
                          
-                         'molid':        {'read':    self.read_int,
-                                          'default': self.read_int(0)},
+                          'molid':        {'read':    self.read_int,
+                                           'default': self.read_int(0)},
                          
-                         'type':         {'read':    self.read_type,
-                                          'default': self.read_int(0)},
+                          'type':         {'read':    self.read_type,
+                                           'default': self.read_int(0)},
+                         
+                          'q':            {'read':    self.read_float,
+                                           'default': self.read_float(0)},
+                         
+                          'x':            {'read':    self.read_float,
+                                           'default': self.read_float(0)},
+                         
+                          'y':            {'read':    self.read_float,
+                                           'default': self.read_float(0)},
+                         
+                          'z':            {'read':    self.read_float,
+                                           'default': self.read_float(0)},
+                         
+                          'ix':           {'read':    self.read_int,
+                                           'default': self.read_int(0)},
+                         
+                          'iy':           {'read':    self.read_int,
+                                           'default': self.read_int(0)},
+                         
+                          'iz':           {'read':    self.read_int,
+                                           'default': self.read_int(0)},
+                          
+                          'vx':           {'read':    self.read_float,
+                                           'default': self.read_float(0)},
+                         
+                          'vy':           {'read':    self.read_float,
+                                           'default': self.read_float(0)},
+                         
+                          'vz':           {'read':    self.read_float,
+                                           'default': self.read_float(0)},
                          
                          }
         
@@ -73,7 +105,7 @@ class Styles:
             return self.read_int(char)
         else:
             return self.read_str(char)
-        
+    
     def read_general(self, char):
         if str(char).isnumeric():
             return self.read_int(char)
@@ -101,6 +133,37 @@ class Styles:
             line.append(value)
         return line
     
+    def gen_atom(self):            
+        # Generate Atom object with pre-defined slots (any possible
+        # attribute set in any supported style will be able to be
+        # added at a later time)
+        class Atom:
+            __slots__ = self.all_per_atom
+        atom = Atom()
+        return atom
+    
+    def fill_atom(self):
+        return
+    
+    def atoms_full(self, line):
+        atom = self.gen_atom()
+        atom.id = int(line[0])
+        atom.molid = int(line[1])
+        atom.type = int(line[2])
+        atom.q = float(line[3])
+        atom.x = float(line[4])
+        atom.y = float(line[5])
+        atom.z = float(line[6])
+        try:
+            atom.ix = int(line[7])
+            atom.iy = int(line[8])
+            atom.iz = int(line[9])
+        except:
+            atom.ix = 0
+            atom.iy = 0
+            atom.iz = 0
+        return atom
+    
 
 
 
@@ -112,6 +175,7 @@ class Atoms(dict):
         # Build this object with some composition
         self.box: Box = Box()
         self.styles: Styles = Styles()
+    
         
     def gen_atom(self, style, line=None):
         if style in self.styles.lammps:
@@ -129,7 +193,7 @@ class Atoms(dict):
         atom = Atom()
         atom.comment = ''
         
-        # File in atom attributes from line, list
+        # File in atom attributes from line list
         if line is None: line = []
         nline = len(line)
         for n in range(len(order)):
