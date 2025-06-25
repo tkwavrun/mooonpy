@@ -44,17 +44,15 @@ def read(mol, filename, sections):
     with file_utils.smart_open(filename) as f:
         #f = f.readlines()
         for n, string in enumerate(f):
-            skip -= 1
-            string = string.strip()
-            
             # skip line between section keywords and "top of the body"
-            if skip >= 0:
+            if skip > 0:
+                skip -= 1
                 continue
             
             # Toggle section "off" since a blank line will be at 
             # the "bottom of the body" (skip handles the blank line
             # at the "top of the body").
-            elif not string:
+            elif string == '\n' or not string:
                 section = ''
                 continue
             
@@ -79,7 +77,7 @@ def read(mol, filename, sections):
             #-------------------------------------------------------#
             if section == 'Atoms':
                 atom = atom_factory() #mol.atoms.styles.gen_atom()
-                atom_reader(atom, mol.atoms.style, data_lst)
+                atom = atom_reader(atom, mol.atoms.style, data_lst)
                 atom.comment = comment
                 mol.atoms[atom.id] = atom
                 
@@ -88,12 +86,13 @@ def read(mol, filename, sections):
                 typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
+                ordered = (id1, id2)
                 
                 bond = bond_factory #mol.bonds.gen_bond()
-                bond.ordered = [id1, id2]
+                bond.ordered = list(ordered) #[id1, id2]
                 bond.comment = comment
                 bond.type = typeID
-                mol.bonds[(id1, id2)] = bond
+                mol.bonds[ordered] = bond
                 
             elif section == 'Angles':
                 #ID = int(data_lst[0])
@@ -101,12 +100,13 @@ def read(mol, filename, sections):
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
+                ordered = (id1, id2, id3)
                 
                 angle = angle_factory #mol.angles.gen_angle()
-                angle.ordered = [id1, id2, id3]
+                angle.ordered = list(ordered) #[id1, id2, id3]
                 angle.comment = comment
                 angle.type = typeID
-                mol.angles[(id1, id2, id3)] = angle
+                mol.angles[ordered] = angle
                 
             elif section == 'Dihedrals':
                 #ID = int(data_lst[0])
@@ -115,12 +115,13 @@ def read(mol, filename, sections):
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
                 id4 = int(data_lst[5])
+                ordered = (id1, id2, id3, id4)
                 
                 dihedral = dihedral_factory #mol.dihedrals.gen_dihedral()
-                dihedral.ordered = [id1, id2, id3, id4]
+                dihedral.ordered = list(ordered) #[id1, id2, id3, id4]
                 dihedral.comment = comment
                 dihedral.type = typeID
-                mol.dihedrals[(id1, id2, id3, id4)] = dihedral
+                mol.dihedrals[ordered] = dihedral
                 
             elif section == 'Impropers':
                 #ID = int(data_lst[0])
@@ -129,12 +130,13 @@ def read(mol, filename, sections):
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
                 id4 = int(data_lst[5])
+                ordered = (id1, id2, id3, id4)
                 
                 improper = improper_factory #mol.impropers.gen_improper()
-                improper.ordered = [id1, id2, id3, id4]
+                improper.ordered = list(ordered) #[id1, id2, id3, id4]
                 improper.comment = comment
                 improper.type = typeID
-                mol.impropers[(id1, id2, id3, id4)] = improper
+                mol.impropers[ordered] = improper
             
             
             # Type labels can initialize a ff_coeffs build
@@ -286,7 +288,6 @@ def read(mol, filename, sections):
                     # We need to toggle ff_coeffs between different sections
                     # so we do not add coeffs to the wrong dictionaries
                     ff_coeffs = None
-                continue
             
 
 

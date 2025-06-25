@@ -53,18 +53,18 @@ class Molspace(object):
             of the desired system.
         """
         
-        kwargs = {'astyles':['full', 'charge'], 'b':2, 'c':3}
+        # kwargs = {'astyles':['full', 'charge'], 'b':2, 'c':3}
         
-        print('kwargs = ', kwargs)
+        # print('kwargs = ', kwargs)
         
-        defaults = {'astyles':['all'],
-                    'b': None,
-                    'lmp_sections': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']
-                    }
-        print('defaults =', defaults)
+        # defaults = {'astyles':['all'],
+        #             'b': None,
+        #             'lmp_sections': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']
+        #             }
+        # print('defaults =', defaults)
         
-        config = {**defaults, **kwargs} 
-        print('config = ', config)
+        # config = {**defaults, **kwargs} 
+        # print('config = ', config)
         
         # Build this object with some composition
         self.atoms: Atoms = Atoms()
