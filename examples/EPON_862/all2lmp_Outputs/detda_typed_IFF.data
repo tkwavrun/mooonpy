@@ -17,7 +17,7 @@ HEADER,  detda.mol  read w/ mol2lmp > atom_typing v1.7 / 4 November 2023 w/PCFF-
 -1.415503226 1.415896774 zlo zhi
 
 Masses
-
+TypeID   Masses
 1   12.01115000  #  c2   
 2   12.01115000  #  c3   
 3   12.01115000  #  cp   

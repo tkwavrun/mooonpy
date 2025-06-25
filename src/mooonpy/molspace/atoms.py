@@ -5,6 +5,8 @@ This module provides a class to organize atoms information
 from .box import Box
 import re
 
+class Atom:
+    pass
 
 class Styles:
     def __init__(self):
@@ -24,9 +26,9 @@ class Styles:
             self.all_per_atom.update( set(self.lammps[style]) )
         for style in self.other:
             self.all_per_atom.update( set(self.other[style]) )
-        self.all_per_atom = tuple(self.all_per_atom)
         
-        self.all_per_atom = ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz', 'comment')
+
+
         
         
         # Generate how to read/write each per-atom attribute and set default
@@ -133,14 +135,26 @@ class Styles:
             line.append(value)
         return line
     
+    def atom(self):
+        # Precompile Atom class once (velocities and comments are
+        # not in normal LAMMPS styles - so generate default values)
+        class Atom:
+            __slots__ = self.all_per_atom
+            # def __init__(self, values):
+            #     self.comment: str = ''
+            #     self.vx: float = 0.0
+            #     self.vy: float = 0.0
+            #     self.vz: float = 0.0
+        return Atom
+    
     def gen_atom(self):            
         # Generate Atom object with pre-defined slots (any possible
         # attribute set in any supported style will be able to be
         # added at a later time)
-        class Atom:
-            __slots__ = self.all_per_atom
-        atom = Atom()
-        return atom
+        # class Atom:
+        # #     __slots__ = self.all_per_atom
+        # atom = Atom()
+        return type('Atom', (), {'__slots__': self.all_per_atom})
     
     def fill_atom(self):
         return
@@ -175,9 +189,18 @@ class Atoms(dict):
         # Build this object with some composition
         self.box: Box = Box()
         self.styles: Styles = Styles()
+        
+    def gen_atom(self):            
+        # Generate Atom object with pre-defined slots (any possible
+        # attribute set in any supported style will be able to be
+        # added at a later time)
+        class Atom:
+             __slots__ = self.styles.all_per_atom
+        atom = Atom()
+        return atom
     
         
-    def gen_atom(self, style, line=None):
+    def gen_atom1(self, style, line=None):
         if style in self.styles.lammps:
             order = self.styles.lammps[style]
         elif style in self.styles.other:

@@ -12,9 +12,9 @@ def is_float(string):
     return bool(float_re.match(string))
 
 def string2digit(string):
-    if str(string).isnumeric():
+    if string.isnumeric():
         return int(string)
-    elif is_float(str(string)):
+    elif is_float(string):
         return float(string)
     else:
         return string
