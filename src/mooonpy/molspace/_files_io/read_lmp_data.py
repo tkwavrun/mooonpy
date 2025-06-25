@@ -46,8 +46,8 @@ def read(mol, filename, config):
                 continue
             
             # Toggle section "off" since a blank line will be at 
-            # the "bottom of the body" b/c skip handles blank line
-            # at the "top of the body".
+            # the "bottom of the body" (skip handles the blank line
+            # at the "top of the body").
             string = string.strip()
             if not string:
                 section = ''
@@ -77,7 +77,7 @@ def read(mol, filename, config):
                 #     atom = getattr(mol.atoms.styles, hard_coded_atom_styles[mol.atoms.style])(data_lst)
                 # else:
                 #     atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
-                # atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
+                # #atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
                 # atom.comment = comment
                 # mol.atoms[atom.id] = atom
                 
@@ -147,7 +147,7 @@ def read(mol, filename, config):
                 bond.type = typeID
                 mol.bonds[(id1, id2)] = bond
                 
-            elif section == 'Angles':# and 'Angles' in sections_kwargs:
+            elif section == 'Angles':
                 #ID = int(data_lst[0])
                 typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
@@ -160,7 +160,7 @@ def read(mol, filename, config):
                 angle.type = typeID
                 mol.angles[(id1, id2, id3)] = angle
                 
-            elif section == 'Dihedrals':# and 'Dihedrals' in sections_kwargs:
+            elif section == 'Dihedrals':
                 #ID = int(data_lst[0])
                 typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
@@ -250,17 +250,16 @@ def read(mol, filename, config):
             #-----------------------------------------------------------------#
             #elif data_str in sections_all:
             elif data_str[0].isalpha():
-                skip = 1
+                skip = 1 # skip the line under each section keyword
                 section = data_str
                 if section not in sections_all:
-                    raise Exception(f'ERROR {data_str} is not a LAMMPS supported section')
+                    raise Exception(f'ERROR {section} is not a supported LAMMPS datafile section')
                 
-    
                 # Set flags for molecule data like atoms, bonds, etc ... Also check if user wants
                 # that section read or not (if not set section to '', to skip reading that section)
                 if section == 'Atoms':
                     mol.atoms.style = comment
-                    if 'Atom' not in sections_kwargs:
+                    if 'Atoms' not in sections_kwargs:
                         section = ''
                 elif section == 'Bonds' and 'Bonds' not in sections_kwargs:
                     section = ''
@@ -273,7 +272,6 @@ def read(mol, filename, config):
                 elif section == 'Velocities' and 'Velocities' not in sections_kwargs:
                     section = ''
     
-                    
                 # Type labels can initialize a ff dictionary (e.g. Atom Type
                 # Labels, will generate the mol.ff.masses and then once masses
                 # are ready, the coeffs will be updated at that point).
@@ -287,7 +285,6 @@ def read(mol, filename, config):
                     ff_coeffs = mol.ff.dihedral_coeffs
                 elif section == 'Improper Type Labels':
                     ff_coeffs = mol.ff.improper_coeffs
-                
                 
                 # Force field related parsing
                 elif section == 'Masses':

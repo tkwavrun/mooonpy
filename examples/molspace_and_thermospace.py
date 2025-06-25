@@ -47,7 +47,7 @@ if __name__ == '__main__':
     def call_lunar():
         mooonpy.Molspace(filename=file, read='lunar')    
     
-    number = 10
+    number = 1
     print('\n\n')
     mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
     print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
