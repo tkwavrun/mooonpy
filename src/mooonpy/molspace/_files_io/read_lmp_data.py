@@ -299,7 +299,7 @@ def read(mol, filename, sections):
             
 
     print_info = False
-    print_info = True
+    #print_info = True
     if print_info:
         print('\n\n\nSTYLES:')
         print('header: ', mol.header[:50])
