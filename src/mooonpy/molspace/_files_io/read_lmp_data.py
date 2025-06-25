@@ -49,73 +49,76 @@ def read(mol, filename, config):
                 
             
             # Toggle between sections
-            #if data_str in sections_all:
-            if data_str[0].isalpha():
+            if data_str in sections_all:
+            #if data_str[0].isalpha():
                 section = data_str
             
                 # We need to toggle ff_coeffs between different sections
                 # so we do not add coeffs to the wrong dictionaries
                 ff_coeffs = None
-
-            # Type labels can initialize a ff dictionary (e.g. Atom Type
-            # Labels, will generate the mol.ff.masses and then once masses
-            # are ready, the coeffs will be updated at that point).
-            if section == 'Atom Type Labels':
-                ff_coeffs = mol.ff.masses
+                
+    
+                # Type labels can initialize a ff dictionary (e.g. Atom Type
+                # Labels, will generate the mol.ff.masses and then once masses
+                # are ready, the coeffs will be updated at that point).
+                if section == 'Atom Type Labels':
+                    ff_coeffs = mol.ff.masses
+                
+                # Force field related parsing
+                if section == 'Masses':
+                    ff_coeffs = mol.ff.masses
+                    ff_coeffs.style = comment
+                elif section == 'Pair Coeffs':
+                    ff_coeffs = mol.ff.pair_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'Bond Coeffs':
+                    ff_coeffs = mol.ff.bond_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'Angle Coeffs':
+                    ff_coeffs = mol.ff.angle_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'Dihedral Coeffs':
+                    ff_coeffs = mol.ff.dihedral_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'Improper Coeffs':
+                    ff_coeffs = mol.ff.improper_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'BondBond Coeffs':
+                    ff_coeffs = mol.ff.bondbond_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'BondAngle Coeffs':
+                    ff_coeffs = mol.ff.bondangle_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'AngleAngleTorsion Coeffs':
+                    ff_coeffs = mol.ff.angleangletorsion_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'EndBondTorsion Coeffs':
+                    ff_coeffs = mol.ff.endbondtorsion_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'MiddleBondTorsion Coeffs':
+                    ff_coeffs = mol.ff.middlebondtorsion_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'BondBond13 Coeffs':
+                    ff_coeffs = mol.ff.bondbond13_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'AngleTorsion Coeffs':
+                    ff_coeffs = mol.ff.angletorsion_coeffs
+                    ff_coeffs.style = comment
+                elif section == 'AngleAngle Coeffs':
+                    ff_coeffs = mol.ff.angleangle_coeffs
+                    ff_coeffs.style = comment
+                
+                # Atoms and topologoy related parsing
+                elif section == 'Atoms':
+                    mol.atoms.style = comment
+                    
+                continue
             
-            # Force field related parsing
-            if section == 'Masses':
-                ff_coeffs = mol.ff.masses
-                ff_coeffs.style = comment
-            elif section == 'Pair Coeffs':
-                ff_coeffs = mol.ff.pair_coeffs
-                ff_coeffs.style = comment
-            elif section == 'Bond Coeffs':
-                ff_coeffs = mol.ff.bond_coeffs
-                ff_coeffs.style = comment
-            elif section == 'Angle Coeffs':
-                ff_coeffs = mol.ff.angle_coeffs
-                ff_coeffs.style = comment
-            elif section == 'Dihedral Coeffs':
-                ff_coeffs = mol.ff.dihedral_coeffs
-                ff_coeffs.style = comment
-            elif section == 'Improper Coeffs':
-                ff_coeffs = mol.ff.improper_coeffs
-                ff_coeffs.style = comment
-            elif section == 'BondBond Coeffs':
-                ff_coeffs = mol.ff.bondbond_coeffs
-                ff_coeffs.style = comment
-            elif section == 'BondAngle Coeffs':
-                ff_coeffs = mol.ff.bondangle_coeffs
-                ff_coeffs.style = comment
-            elif section == 'AngleAngleTorsion Coeffs':
-                ff_coeffs = mol.ff.angleangletorsion_coeffs
-                ff_coeffs.style = comment
-            elif section == 'EndBondTorsion Coeffs':
-                ff_coeffs = mol.ff.endbondtorsion_coeffs
-                ff_coeffs.style = comment
-            elif section == 'MiddleBondTorsion Coeffs':
-                ff_coeffs = mol.ff.middlebondtorsion_coeffs
-                ff_coeffs.style = comment
-            elif section == 'BondBond13 Coeffs':
-                ff_coeffs = mol.ff.bondbond13_coeffs
-                ff_coeffs.style = comment
-            elif section == 'AngleTorsion Coeffs':
-                ff_coeffs = mol.ff.angletorsion_coeffs
-                ff_coeffs.style = comment
-            elif section == 'AngleAngle Coeffs':
-                ff_coeffs = mol.ff.angleangle_coeffs
-                ff_coeffs.style = comment
-            
-            # Atoms and topologoy related parsing
-            elif section == 'Atoms':
-                mol.atoms.style = comment
 
-            continue
-            if n == 0:
-                mol.header = data_str
                 
             # Get box dimensions
+            if n == 0:
+                mol.header = data_str
             elif 'xlo' in data_str and 'xhi' in data_str:
                 mol.atoms.box.xlo = float(data_lst[0]) 
                 mol.atoms.box.xhi = float(data_lst[1]) 
@@ -166,11 +169,11 @@ def read(mol, filename, config):
 
                 
             elif section == 'Atoms' and 'Atoms' in sections_kwargs:
-                print(n, line)
                 if mol.atoms.style in hard_coded_atom_styles:
                     atom = getattr(mol.atoms.styles, hard_coded_atom_styles[mol.atoms.style])(data_lst)
                 else:
                     atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
+                #atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
                 atom.comment = comment
                 mol.atoms[atom.id] = atom
                 
@@ -249,8 +252,8 @@ def read(mol, filename, config):
     # for n, (key, value) in enumerate(mol.atoms.items()):
     #     if n < 5:
     #         print(key, value.type, value.x, value.y, value.z, value.comment)
-    # line = mol.atoms.styles.gen_line(mol.atoms[1], style='body')
-    # print(line)
+    # # line = mol.atoms.styles.gen_line(mol.atoms[1], style='body')
+    # # print(line)
     
     # print('\n\nBonds')
     # for n, (key, value) in enumerate(mol.bonds.items()):
@@ -286,9 +289,9 @@ def read(mol, filename, config):
     # d = mol.ff.bondbond13_coeffs
     # d = mol.ff.angletorsion_coeffs
     # d = mol.ff.angleangle_coeffs
-    # # print('\n\nFF-CHECK: ', d.style)
-    # # for key, value in d.items():
-    # #     print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
+    # print('\n\nFF-CHECK: ', d.style)
+    # for key, value in d.items():
+    #     print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
         
 
             
