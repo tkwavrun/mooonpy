@@ -52,26 +52,27 @@ class Molspace(object):
             matrix is ``2*N``, with `N` the number of biquad sections
             of the desired system.
         """
+        
         # Build this object with some composition
-        self.atoms: Atoms = Atoms()
-        self.bonds: Bonds = Bonds()
-        self.angles: Angles = Angles()
-        self.dihedrals: Dihedrals = Dihedrals()
-        self.impropers: Impropers = Impropers()
-        self.ff: ForceField = ForceField()
+        self.atoms: Atoms = Atoms(**kwargs)
+        self.bonds: Bonds = Bonds(**kwargs)
+        self.angles: Angles = Angles(**kwargs)
+        self.dihedrals: Dihedrals = Dihedrals(**kwargs)
+        self.impropers: Impropers = Impropers(**kwargs)
+        self.ff: ForceField = ForceField(**kwargs)
 
         # Handle file initilaizations
         self.filename = filename
         self.header = ''
         if filename:
             if os.path.exists(filename):
-                self.read_files(filename, kwargs)
+                self.read_files(filename, **kwargs)
             else:
                 raise FileNotFoundError(f'{filename} was not found or is a directory')
         
 
         
-    def read_files(self, filename, kwargs):
+    def read_files(self, filename, **kwargs):
         root, ext = os.path.splitext(filename)
         defaults = {'read':'mooonpy', 'sections':('Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities')}
         config = {**defaults, **kwargs}

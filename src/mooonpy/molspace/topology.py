@@ -2,13 +2,20 @@
 
 
 
-class Nbody():  
-    __slots__ = ('bo', 'type', 'ordered', 'comment')
-    def __init__(self):
-        self.bo: float = 0.0
-        self.type: int = 0
-        self.ordered: list[int] = []
-        self.comment: str = ''
+
+def make_class(class_name, slots, defaults=None):
+    defaults = defaults or {}
+    
+    class Dynamic:
+        __slots__ = slots
+        def __init__(self, values=None):
+            values = values or {}
+            merged = {**defaults, **values}
+            for name in self.__slots__:
+                setattr(self, name, merged.get(name))
+
+    Dynamic.__name__ = class_name
+    return Dynamic
         
         
 class Bonds(dict):    
@@ -16,7 +23,11 @@ class Bonds(dict):
         super().__init__(*args, **kwargs)
         
     def gen_bond(self):
-        bond: Nbody = Nbody()
+        class_name = 'Bond'
+        slots = ('bo', 'type', 'ordered', 'comment')
+        defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':''}
+        Bond = make_class(class_name, slots, defaults=defaults)
+        bond = Bond()
         return bond
     
     
@@ -25,7 +36,11 @@ class Angles(dict):
         super().__init__(*args, **kwargs)
         
     def gen_angle(self):
-        angle: Nbody = Nbody()
+        class_name = 'Angle'
+        slots = ('type', 'ordered', 'comment')
+        defaults = {'type':0, 'ordered':[], 'comment':''}
+        Angle = make_class(class_name, slots, defaults=defaults)
+        angle = Angle()
         return angle
 
 
@@ -34,7 +49,11 @@ class Dihedrals(dict):
         super().__init__(*args, **kwargs)
         
     def gen_dihedral(self):
-        dihedral: Nbody = Nbody()
+        class_name = 'Dihedral'
+        slots = ('type', 'ordered', 'comment')
+        defaults = {'type':0, 'ordered':[], 'comment':''}
+        Dihedral = make_class(class_name, slots, defaults=defaults)
+        dihedral = Dihedral()
         return dihedral
 
 
@@ -43,7 +62,11 @@ class Impropers(dict):
         super().__init__(*args, **kwargs)
         
     def gen_improper(self):
-        improper: Nbody = Nbody()
+        class_name = 'Improper'
+        slots = ('type', 'ordered', 'comment')
+        defaults = {'type':0, 'ordered':[], 'comment':''}
+        Improper = make_class(class_name, slots, defaults=defaults)
+        improper = Improper()
         return improper
 
 

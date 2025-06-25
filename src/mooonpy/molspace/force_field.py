@@ -19,7 +19,7 @@ class Coefficients(dict):
 
 
 class ForceField(object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         # Build this object with some composition
         self.masses: Coefficients = Coefficients() # {type : Parameters-object}
         self.pair_coeffs: Coefficients = Coefficients() # {type : Parameters-object}

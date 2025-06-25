@@ -22,36 +22,85 @@ def int_str(string):
         return string
 
 class Styles:
-    def __init__(self):
+    def __init__(self, **kwargs):
         # Set up supported styles for LAMMPS and other file formats (NOTE: for LAMMPS 'type' attributes
         # these can be an int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file).        
         self.read = {}     # {'style' : (int or float or str)}     -> (int or float or str) sets how to read string
         self.styles = {}   # {'style' : (attr1, attr2, ...) }      -> (attr1, attr2, ...) sets attr name (e.g. 'id' 'x')
         self.defaults = {} # {'style'}: (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
         
-        self.read['angle']       = (int,  int,      int_str,    float, float, float, int,  int,  int)
-        self.styles['angle']     = ('id', 'molid', 'type',      'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['angle']   = ( 0,    0,       0,          0.0,   0.0,   0.0,   0,    0,    0)
+        self.read['angle']             = (int,  int,     int_str, float, float, float, int,  int,  int)
+        self.styles['angle']           = ('id', 'molid', 'type',  'x',   'y',   'z',   'ix', 'iy', 'iz')
+        self.defaults['angle']         = ( 0,    0,       0,      0.0,   0.0,   0.0,    0,    0,    0)
         
-        self.read['full']        = (int,   int,     int_str,   float, float, float, float, int, int, int)
-        self.styles['full']      = ('id', 'molid', 'type',     'q',   'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['full']    = ( 0,    0,       0,         0.0,    0.0,    0.0,   0.0,   0,    0,    0)
+        self.read['atomic']            = (int,  int_str, float, float, float, int,  int,  int)
+        self.styles['atomic']          = ('id', 'type',  'x',   'y',   'z',   'ix', 'iy', 'iz')
+        self.defaults['atomic']        = ( 0,    0,      0.0,   0.0,   0.0,    0,    0,    0)
         
-        self.read['_random']     = (str,       str,       str,    int,   int,   int)
-        self.styles['_random']   = ('comment', 'element', 'name', 'vx', 'vy',  'vz')
-        self.defaults['_random'] = ('',        '_default',        '',      0,    0,     0)
+        self.read['body']              = (int,  int_str,  int,        float,  float, float, float, int,  int,  int)
+        self.styles['body']            = ('id', 'type',   'bodyflag', 'mass', 'x',   'y',   'z',   'ix', 'iy', 'iz')
+        self.defaults['body']          = ( 0,    0,        0,          0.0,   0.0,   0.0,   0.0,   0,    0,     0)
+        
+        self.read['bpm/sphere']        = (int,  int,     int_str,  float,      float,     float, float, float, int,  int,  int)
+        self.styles['bpm/sphere']      = ('id', 'molid', 'type',   'diameter', 'density', 'x',   'y',   'z',   'ix', 'iy', 'iz')
+        self.defaults['bpm/sphere']    = ( 0,    0,       0,        0.0,       0.0,       0.0,   0.0,   0.0,    0,    0,   0)
+        
+        self.read['rheo/thermal']      = (int,  int_str, int,      float, float,     float, float, float, int,  int,  int)
+        self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy',  'x',   'y',   'z',   'ix', 'iy', 'iz')
+        self.defaults['rheo/thermal']  = ( 0,    0,       0,        0.0,   0.0,       0.0,   0.0,   0.0,   0,    0,    0)
+        
+        # self.read[
+        # self.styles[
+        # self.defaults[
+        
+        self.read['full']              = (int,  int,     int_str, float, float, float, float, int,  int,  int)
+        self.styles['full']            = ('id', 'molid', 'type',  'q',   'x',   'y',   'z',   'ix', 'iy', 'iz')
+        self.defaults['full']          = ( 0,    0,       0,      0.0,   0.0,   0.0,   0.0,   0,    0,    0)
+        
+        self.read['charge']            = (int,  int_str, float, float, float, float, int,  int,  int)
+        self.styles['charge']          = ('id', 'type',  'q',   'x',   'y',   'z',   'ix', 'iy', 'iz')
+        self.defaults['charge']        = ( 0,    0,      0.0,   0.0,   0.0,   0.0,   0.0,   0,    0)
+        
+        self.read['_random']           = (str,       str,       str,    int,  int,  int)
+        self.styles['_random']         = ('comment', 'element', 'name', 'vx', 'vy', 'vz')
+        self.defaults['_random']       = ('',        '',        '',      0,    0,    0)
+        
+        self.read['custom']            = ()
+        self.styles['custom']          = ()
+        self.defaults['custom']        = ()
+        
+        
+        # Setup which styles should be built when an atom is generated
+        if 'astyles' in kwargs:
+            astyles = kwargs['astyles']
+            if isinstance(astyles, (tuple, list)):
+                build = tuple(astyles)
+            else:
+                build = tuple([kwargs['astyles']])
+        else:
+            build = ('all', )
 
         
         # Consolidate all attrs and defaults into a dict and tuple to 
         # be able to initialize an Atom() object as quickly as possible
         self.all_defaults = {} # {'attr-name':default-value}
         for style in self.styles:
+            if style in build or 'all' in build or style == '_random':
+                attrs = self.styles[style]
+                defaults = self.defaults[style]
+                for attr, default in zip(attrs, defaults):
+                    self.all_defaults[attr] = default
+        self.all_per_atom = tuple(self.all_defaults.keys())
+        
+        
+    def update_build(self, astyles):
+        for style in astyles:
             attrs = self.styles[style]
             defaults = self.defaults[style]
             for attr, default in zip(attrs, defaults):
                 self.all_defaults[attr] = default
         self.all_per_atom = tuple(self.all_defaults.keys())
-
+        return
         
     def gen_atom(self):
         class_name = 'Atom'
@@ -60,7 +109,6 @@ class Styles:
         Atom = make_class(class_name, slots, defaults=defaults)
         atom = Atom()
         return atom
-        
     
     def fill_atom(self, atom, style, data_lst):
         read = self.read[style]
@@ -71,6 +119,14 @@ class Styles:
         return
     
     def read_full(self, atom, style, data_lst):
-        atom.element = 'full'
+        atom.id = int(data_lst[0])
+        atom.molid = int(data_lst[1])
+        atom.type = int(data_lst[2])
+        atom.q = float(data_lst[3])
+        atom.x = float(data_lst[4])
+        atom.y = float(data_lst[5])
+        atom.z = float(data_lst[6])
+        atom.ix = int(data_lst[7])
+        atom.iy = int(data_lst[8])
+        atom.iz = int(data_lst[9])
         return 
-

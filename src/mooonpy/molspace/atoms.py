@@ -14,7 +14,7 @@ class Atoms(dict):
         
         # Build this object with some composition
         self.box: Box = Box()
-        self.styles: Styles = Styles()
+        self.styles: Styles = Styles(**kwargs)
         
         
     def shift(self, sx=0, sy=0, sz=0):

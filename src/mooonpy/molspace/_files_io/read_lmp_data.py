@@ -5,8 +5,6 @@ Created on Mon Jun 23 11:33:04 2025
 @author: jdkem
 """
 from ...tools import file_utils
-import time
-import timeit
 
 
 
@@ -37,8 +35,6 @@ def read(mol, filename, config):
     # Find "hard coded" atom style reads for performance and set atom_reader to slow and update later on
     hard_coded_atom_reading_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('read_')}
     atom_reader = mol.atoms.styles.fill_atom
-    print(hard_coded_atom_reading_styles)
-    
     
     
     # Open and read contents from file
@@ -83,6 +79,7 @@ def read(mol, filename, config):
             #-------------------------------------------------------#
             if section == 'Atoms':
                 atom = atom_factory() #mol.atoms.styles.gen_atom()
+                atom.comment = comment
                 atom_reader(atom, mol.atoms.style, data_lst)
                 mol.atoms[atom.id] = atom
                 
@@ -361,11 +358,3 @@ def read(mol, filename, config):
         print('\n\nFF-CHECK: ', d.style)
         for key, value in d.items():
             print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
-            
-
-            
-
-        
-
-            
-        
