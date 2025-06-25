@@ -29,7 +29,6 @@ class Angles(dict):
         return angle
 
 
-
 class Dihedrals(dict):    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,7 +36,6 @@ class Dihedrals(dict):
     def gen_dihedral(self):
         dihedral: Nbody = Nbody()
         return dihedral
-
 
 
 class Impropers(dict):    

@@ -11,9 +11,41 @@ class Atom:
 class Styles:
     def __init__(self):
         # Set up supported styles for LAMMPS and other file formats
-        self.lammps = {'full':         ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
-                       'charge':       ('id', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+        self.lammps = {'angle':        ('id', 'molid', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'atomic':       ('id', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
                        'body':         ('id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       
+                       'bpm/sphere':   ('id', 'molid', 'type', 'diameter', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'charge':       ('id', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       
+                       'dielectric':   ('id', 'type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz', 'area', 'ed', 'em', 'epsilon', 'curvature', 'ix', 'iy', 'iz'),
+                       'dipole':       ('id', 'type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz', 'ix', 'iy', 'iz'),
+                       'dpd':          ('id', 'type', 'theta', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       
+                       'edpd':         ('id', 'type', 'edpd_temp', 'edpd_cv', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'electron':     ('id', 'type',  'espin',  'eradius', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'ellipsoid':    ('id', 'type',  'ellipsoidflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'full':         ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       
+                       'line':         ('id', 'molid', 'type', 'lineflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'mdpd':         ('id', 'type', 'rho', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'molecular':    ('id', 'molid', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'peri':         ('id', 'type', 'volume', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       
+                       'rheo':         ('id', 'type', 'status', 'rho', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'rheo/thermal': ('id', 'type', 'status', 'rho', 'energy', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'smd':          ('id', 'type', 'molecule', 'volume', 'mass', 'kradius', 'cradius', 'x0', 'y0', 'z0', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'sph':          ('id', 'type', 'rho', 'esph', 'cv', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       
+                       'sphere':       ('id', 'type', 'diameter', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'spin':         ('id', 'type', 'x', 'y', 'z', 'spx', 'spy', 'spz', 'sp', 'ix', 'iy', 'iz'),
+                       'tdpd':         ('id', 'type', 'x', 'y', 'z', 'ccN'), # WARNING 'ccN', needs to be expaned to 'cc1', 'cc2', ... so 'tdpd' NOT TRULY SUPPORTED
+                       
+                       'template':     ('id', 'type', 'molid', 'template_index', 'template_atom', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'tri':          ('id', 'molid', 'type', 'triangleflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'wavepacket':   ('id', 'type', 'q', 'triangleflag', 'espin', 'eradius', 'etag', 'cs_re', 'cs_im', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
+                       'hybrid':       ('id', 'type', 'x', 'y', 'z', 'sub_styleN'), # WARNING 'sub_styleN', needs to be expaned to 'sub_style1', 'sub_style2', ... so 'hybrid' NOT TRULY SUPPORTED
+
                        'custom':       ()}
         
         self.other = {'xyz':          ('element', 'x', 'y', 'z'),
@@ -21,7 +53,7 @@ class Styles:
         
         
         # Get all per-atom attributes from both lammps and other atom styles
-        self.all_per_atom = set(['comment', 'vx', 'vy', 'vz']) # we will want to be able to have a comment and velocities
+        self.all_per_atom = set(['comment', 'vx', 'vy', 'vz', 'element']) # we will want to be able to have a comment and velocities
         for style in self.lammps:
             self.all_per_atom.update( set(self.lammps[style]) )
         for style in self.other:
@@ -196,25 +228,22 @@ class Atoms(dict):
         # added at a later time)
         class Atom:
              __slots__ = self.styles.all_per_atom
+             def __init__(self):
+                 self.comment: str = ''
+                 self.vx: float = 0.0
+                 self.vy: float = 0.0
+                 self.vz: float = 0.0
         atom = Atom()
         return atom
     
         
-    def gen_atom1(self, style, line=None):
+    def fill_atom(self, atom, style, line=None):
         if style in self.styles.lammps:
             order = self.styles.lammps[style]
         elif style in self.styles.other:
             order = self.styles.other[style]
         else:
             raise KeyError(f'Error "{style}" not in styles.lammps or styles.other')
-            
-        # Generate Atom object with pre-defined slots (any possible
-        # attribute set in any supported style will be able to be
-        # added at a later time)
-        class Atom:
-            __slots__ = self.styles.all_per_atom
-        atom = Atom()
-        atom.comment = ''
         
         # File in atom attributes from line list
         if line is None: line = []
