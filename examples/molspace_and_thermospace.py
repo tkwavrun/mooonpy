@@ -54,9 +54,9 @@ if __name__ == '__main__':
     mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
     print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
     
-    # print('\n\n')
-    # lunar_time = timeit.timeit(stmt=call_lunar, number=number)
-    # print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
+    print('\n\n')
+    lunar_time = timeit.timeit(stmt=call_lunar, number=number)
+    print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
     
     
     # class A:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-def make_class(class_name, slots, defaults=None):
+def _make_class(class_name, slots, defaults=None):
     defaults = defaults or {}
     
     class Dynamic:
@@ -15,7 +15,7 @@ def make_class(class_name, slots, defaults=None):
     Dynamic.__name__ = class_name
     return Dynamic
 
-def int_str(string):
+def _int_str(string):
     if string.isnumeric():
         return int(string)
     else:
@@ -25,7 +25,7 @@ class Styles:
     def __init__(self, astyles):
         
         # Set up supported styles for LAMMPS and other file formats (NOTE: for the LAMMPS 'type' attributes they can be an
-        # int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file - so need to use int_str function).  
+        # int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file - so need to use _int_str function).  
         #
         # The self.read, self.styles, and self.defaults dictionaries are meant to provide very easy general purpose way
         # to extend the ability to read and write LAMMPS styles. However, due to the general purpose nature they are not
@@ -41,23 +41,23 @@ class Styles:
         self.styles = {}   # {'style' : (attr1, attr2, ...) }      -> (attr1, attr2, ...) sets attr name (e.g. 'id' 'x')
         self.defaults = {} # {'style'}: (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
         
-        self.read['angle']             = (int,  int,     int_str, float, float, float, int,  int,  int)
+        self.read['angle']             = (int,  int,    _int_str, float, float, float, int,  int,  int)
         self.styles['angle']           = ('id', 'molid', 'type',  'x',   'y',   'z',   'ix', 'iy', 'iz')
         self.defaults['angle']         = ( 0,    0,       0,      0.0,   0.0,   0.0,    0,    0,    0)
         
-        self.read['atomic']            = (int,  int_str, float, float, float, int,  int,  int)
+        self.read['atomic']            = (int, _int_str, float, float, float, int,  int,  int)
         self.styles['atomic']          = ('id', 'type',  'x',   'y',   'z',   'ix', 'iy', 'iz')
         self.defaults['atomic']        = ( 0,    0,      0.0,   0.0,   0.0,    0,    0,    0)
         
-        self.read['body']              = (int,  int_str,  int,        float,  float, float, float, int,  int,  int)
+        self.read['body']              = (int, _int_str,  int,        float,  float, float, float, int,  int,  int)
         self.styles['body']            = ('id', 'type',   'bodyflag', 'mass', 'x',   'y',   'z',   'ix', 'iy', 'iz')
         self.defaults['body']          = ( 0,    0,        0,          0.0,   0.0,   0.0,   0.0,   0,    0,     0)
         
-        self.read['bpm/sphere']        = (int,  int,     int_str,  float,      float,     float, float, float, int,  int,  int)
+        self.read['bpm/sphere']        = (int,  int,    _int_str,  float,      float,     float, float, float, int,  int,  int)
         self.styles['bpm/sphere']      = ('id', 'molid', 'type',   'diameter', 'density', 'x',   'y',   'z',   'ix', 'iy', 'iz')
         self.defaults['bpm/sphere']    = ( 0,    0,       0,        0.0,       0.0,       0.0,   0.0,   0.0,    0,    0,   0)
         
-        self.read['rheo/thermal']      = (int,  int_str, int,      float, float,     float, float, float, int,  int,  int)
+        self.read['rheo/thermal']      = (int, _int_str, int,      float, float,     float, float, float, int,  int,  int)
         self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy',  'x',   'y',   'z',   'ix', 'iy', 'iz')
         self.defaults['rheo/thermal']  = ( 0,    0,       0,        0.0,   0.0,       0.0,   0.0,   0.0,   0,    0,    0)
         
@@ -65,11 +65,11 @@ class Styles:
         # self.styles[
         # self.defaults[
         
-        self.read['full']              = (int,  int,     int_str, float, float, float, float, int,  int,  int)
+        self.read['full']              = (int,  int,    _int_str, float, float, float, float, int,  int,  int)
         self.styles['full']            = ('id', 'molid', 'type',  'q',   'x',   'y',   'z',   'ix', 'iy', 'iz')
         self.defaults['full']          = ( 0,    0,       0,      0.0,   0.0,   0.0,   0.0,   0,    0,    0)
         
-        self.read['charge']            = (int,  int_str, float, float, float, float, int,  int,  int)
+        self.read['charge']            = (int, _int_str, float, float, float, float, int,  int,  int)
         self.styles['charge']          = ('id', 'type',  'q',   'x',   'y',   'z',   'ix', 'iy', 'iz')
         self.defaults['charge']        = ( 0,    0,      0.0,   0.0,   0.0,   0.0,   0.0,   0,    0)
         
@@ -108,7 +108,7 @@ class Styles:
         class_name = 'Atom'
         slots = self.all_per_atom
         defaults = self.all_defaults
-        self.Atom = make_class(class_name, slots, defaults=defaults)
+        self.Atom = _make_class(class_name, slots, defaults=defaults)
 
         
     def update_astyles(self, astyles):
