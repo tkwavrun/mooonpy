@@ -42,7 +42,7 @@ if __name__ == '__main__':
     file = 'EPON_862/detda_typed_IFF_merged.data'
     file = 'EPON_862/system1_cell_replicate.data'
     def call_mooonpy():
-        m = mooonpy.Molspace(filename=file, read='mooonpy', astyles=['full'])
+        m = mooonpy.Molspace(filename=file, read='mooonpy', astyles=['full', 'all1'])
         # i = 1
         # print(m.atoms[i].comment, m.atoms[i].diameter)
     
@@ -54,9 +54,9 @@ if __name__ == '__main__':
     mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
     print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
     
-    print('\n\n')
-    lunar_time = timeit.timeit(stmt=call_lunar, number=number)
-    print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
+    # print('\n\n')
+    # lunar_time = timeit.timeit(stmt=call_lunar, number=number)
+    # print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
     
     
     # class A:

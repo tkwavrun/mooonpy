@@ -81,9 +81,10 @@ class Styles:
         # Consolidate all attrs and defaults into a dict and tuple to 
         # be able to initialize an Atom() object as quickly as possible
         self.all_defaults = {} # {'attr-name':default-value}
+        #print('Generating atom styles: ')
         for style in self.styles:
             if style in build or 'all' in build or style.startswith('_'):
-                #print('Building atom style: ', style)
+                #print(' - Building atom style: ', style)
                 attrs = self.styles[style]
                 defaults = self.defaults[style]
                 for attr, default in zip(attrs, defaults):
@@ -91,8 +92,8 @@ class Styles:
         self.all_per_atom = tuple(self.all_defaults.keys())
         
         
-        # Generate an class Atom that gen_atom() will
-        # use as a blue print for that factory
+        # Generate an Atom class with necessary slots and defaults, which will
+        # be used by atom_factory() method to generate an instance of this class
         class_name = 'Atom'
         slots = self.all_per_atom
         defaults = self.all_defaults
@@ -100,20 +101,22 @@ class Styles:
 
         
     def update_build(self, astyles):
+        # Update defaults
         for style in astyles:
             attrs = self.styles[style]
             defaults = self.defaults[style]
             for attr, default in zip(attrs, defaults):
                 self.all_defaults[attr] = default
         self.all_per_atom = tuple(self.all_defaults.keys())
+        
+        # Re-generate the Atom class with the new defaults
+        class_name = 'Atom'
+        slots = self.all_per_atom
+        defaults = self.all_defaults
+        self.Atom = make_class(class_name, slots, defaults=defaults)
         return
         
     def atom_factory(self):
-        # class_name = 'Atom'
-        # slots = self.all_per_atom
-        # defaults = self.all_defaults
-        # Atom = make_class(class_name, slots, defaults=defaults)
-        #atom = Atom()
         return self.Atom()
     
     def fill_atom(self, atom, style, data_lst):

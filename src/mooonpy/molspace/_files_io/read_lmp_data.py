@@ -38,29 +38,12 @@ def read(mol, filename, sections):
     atom_reader = mol.atoms.styles.fill_atom
     
     
-    # Setup defaults
-    natoms: int = 0
-    nbonds: int = 0
-    nangles: int = 0
-    ndihedrals: int = 0
-    nimpropers: int = 0
-    
-    natomtypes: int = 0
-    nbondstypes: int = 0
-    nangletypess: int = 0
-    ndihedralstypes: int = 0
-    nimproperstypes: int = 0
-    
-    # Setup list to hold atoms, bonds, etc objects
-    atom_objects: list[object] = []
-    
-    
     # Open and read contents from file
     skip: int = 0
     section: str = ''
     ff_coeffs: None = None # Will be a pointer to specifc ff_coeffs to update
     with file_utils.smart_open(filename) as f:
-        #f = f.readlines()
+        f = f.readlines()
         for n, string in enumerate(f):
             # skip line between section keywords and "top of the body"
             if skip > 0:
@@ -95,7 +78,6 @@ def read(mol, filename, sections):
             #-------------------------------------------------------#
             if section == 'Atoms':
                 atom = atom_factory()
-                #atom = atom_objects.pop()
                 atom = atom_reader(atom, mol.atoms.style, data_lst)
                 atom.comment = comment
                 mol.atoms[atom.id] = atom
@@ -191,41 +173,6 @@ def read(mol, filename, sections):
                     params.comment = comment
                     params.type_label = type_label
                     ff_coeffs[typeID] = params  
-                    
-                    
-            # Get number of atoms, bonds, types, ...
-            elif data_str.endswith('atoms'):
-                natoms = int(data_lst[0])
-                #atom_objects = [atom_factory() for _ in range(natoms)]
-                continue
-            elif data_str.endswith('bonds'):
-                nbonds = int(data_lst[0])
-                continue
-            elif data_str.endswith('angles'):
-                nangles = int(data_lst[0])
-                continue
-            elif data_str.endswith('dihedrals'):
-                ndihedrals = int(data_lst[0])
-                continue
-            elif data_str.endswith('impropers'):
-                nimpropers = int(data_lst[0])
-                continue
-                
-            elif data_str.endswith('atom types'):
-                natomtypes = int(data_lst[0])
-                continue
-            elif data_str.endswith('bond types'):
-                nbondtypes = int(data_lst[0])
-                continue
-            elif data_str.endswith('angle types'):
-                nangletypes = int(data_lst[0])
-                continue
-            elif data_str.endswith('dihedral types'):
-                ndihedraltypes = int(data_lst[0])
-                continue
-            elif data_str.endswith('improper types'):
-                nimpropertypes = int(data_lst[0])
-                continue
                    
             # Get box dimensions
             elif 'xlo' in data_str and 'xhi' in data_str:
