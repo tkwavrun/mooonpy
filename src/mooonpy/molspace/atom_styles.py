@@ -101,6 +101,10 @@ class Styles:
                 for attr, default in zip(attrs, defaults):
                     self.all_defaults[attr] = default
         self.all_per_atom = tuple(self.all_defaults.keys())
+        # print()
+        # print('self.all_per_atom = ', self.all_per_atom)
+        # print()
+        # print('self.all_defaults = ', self.all_defaults)
         
         
         # Generate an Atom class with necessary slots and defaults, which will

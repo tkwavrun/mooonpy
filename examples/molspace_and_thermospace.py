@@ -65,7 +65,7 @@ if __name__ == '__main__':
         return old/new
     
     print('\n\n')
-    print(f'Percent increase performance  : {perf_percent(lunar_time, mooonpy_time)} % | {perf_xtimes(lunar_time, mooonpy_time)} X for {number} runs on 100,000 atom system')
+    print(f'Percent increase performance  : {perf_percent(lunar_time, mooonpy_time)} % | {perf_xtimes(lunar_time, mooonpy_time)} X')
     
     
     # class A:
