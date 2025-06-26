@@ -134,7 +134,7 @@ class Styles:
     def atom_factory(self):
         return self.Atom()
     
-    def fill_atom(self, atom, style, data_lst):
+    def atom_fill(self, atom, style, data_lst):
         reader = self.read[style]
         attrs = self.styles[style]
         for string, attr, func in zip(data_lst, attrs, reader):
@@ -176,3 +176,27 @@ class Styles:
             atom.iy = 0
             atom.iz = 0
         return atom
+    
+    def atom_line(self, atom, style):
+        buffer = 2
+        attrs = self.styles[style]
+        line = ''
+        for attr in attrs:
+            value = getattr(atom, attr)
+            if isinstance(value, (int, str)):
+                nchars = len(str(value))
+                space = nchars + 2*buffer
+                string = '{text:^{s}}'.format(text=value, s=space)
+            elif isinstance(value, float):
+                value = '{:.16f}'.format(value)
+                nchars = len(str(value))
+                space = nchars + 2*buffer
+                string = '{text:^{s}}'.format(text=value, s=space)
+            else:
+                string = '{}'.format(value)  
+            line += string
+        return line
+    
+    
+    def line_full(self):
+        return

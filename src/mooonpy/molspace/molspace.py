@@ -57,14 +57,13 @@ class Molspace(object):
         # Get some basic config options from kwargs or setup defaults
         #print(kwargs)
         
-        astyles = kwargs.pop('astyles', ['all']) # ['read-atom-style', 'write-atom-style'] or ['read-atom-style']
-        dsect = kwargs.pop('dsect', ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']) # 
-        read = kwargs.pop('read', 'mooonpy')
+        self.astyles = kwargs.pop('astyles', ['all', 'full']) # ['read-atom-style', 'write-atom-style'] or ['read-atom-style']
+        self.dsect = kwargs.pop('dsect', ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']) # 
         
         #print(kwargs)
         
         # Build this object with some composition
-        self.atoms: Atoms = Atoms(astyles)
+        self.atoms: Atoms = Atoms(self.astyles)
         self.bonds: Bonds = Bonds()
         self.angles: Angles = Angles()
         self.dihedrals: Dihedrals = Dihedrals()
@@ -75,14 +74,13 @@ class Molspace(object):
         self.filename = filename
         self.header = ''
         if filename:
+            if not self.filename:
+                pass
+            
             if not os.path.exists(filename):
                 raise FileNotFoundError(f'{filename} was not found or is a directory')
-                
-            # TODO: Remove LUNAR TESTS
-            if read == 'mooonpy':
-                self.read_files(filename, dsect=dsect)
-            if read == 'lunar':
-                _files_io.read_lmp.Molecule_File(filename, method='forward', sections=dsect)   
+            
+            self.read_files(filename, dsect=self.dsect) 
 
                 
         
@@ -96,5 +94,10 @@ class Molspace(object):
             _files_io.read_lmp_data.read(self, filename, dsect)
             
         return None
+    
+    def write_files(self, filename, atom_style='full'):
+        root, ext = os.path.splitext(filename)     
+        if filename.endswith('.data'):
+            _files_io.write_lmp_data.write(self, filename, atom_style)
         
         

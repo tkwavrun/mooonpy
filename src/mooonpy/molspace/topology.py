@@ -27,8 +27,8 @@ class Bonds(dict):
         # Generate an Bond class with necessary slots and defaults, which will
         # be used by bond_factory() method to generate an instance of this class
         class_name = 'Bond'
-        slots = ('bo', 'type', 'ordered', 'comment')
-        defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':''}
+        defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':'', 'dist':0.0}
+        slots = tuple(defaults.keys())
         self.Bond = _make_class(class_name, slots, defaults=defaults)
         
     def bond_factory(self):
@@ -43,8 +43,8 @@ class Angles(dict):
         # Generate an Angle class with necessary slots and defaults, which will
         # be used by angle_factory() method to generate an instance of this class
         class_name = 'Angle'
-        slots = ('type', 'ordered', 'comment')
-        defaults = {'type':0, 'ordered':[], 'comment':''}
+        defaults = {'type':0, 'ordered':[], 'comment':'', 'theta':0.0}
+        slots = tuple(defaults.keys())
         self.Angle = _make_class(class_name, slots, defaults=defaults)
         
     def angle_factory(self):
@@ -59,8 +59,8 @@ class Dihedrals(dict):
         # Generate an Dihedral class with necessary slots and defaults, which will
         # be used by dihedral_factory() method to generate an instance of this class
         class_name = 'Dihedral'
-        slots = ('type', 'ordered', 'comment')
-        defaults = {'type':0, 'ordered':[], 'comment':''}
+        defaults = {'type':0, 'ordered':[], 'comment':'', 'phi':0.0}
+        slots = tuple(defaults.keys())
         self.Dihedral = _make_class(class_name, slots, defaults=defaults)
         
     def dihedral_factory(self):
@@ -75,8 +75,8 @@ class Impropers(dict):
         # Generate an Improper class with necessary slots and defaults, which will
         # be used by improper_factory() method to generate an instance of this class
         class_name = 'Improper'
-        slots = ('type', 'ordered', 'comment')
-        defaults = {'type':0, 'ordered':[], 'comment':''}
+        defaults = {'type':0, 'ordered':[], 'comment':'', 'chi':0.0}
+        slots = tuple(defaults.keys())
         self.Improper = _make_class(class_name, slots, defaults=defaults)
         
     def improper_factory(self):
