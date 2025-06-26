@@ -124,7 +124,7 @@ class Styles:
         class_name = 'Atom'
         slots = self.all_per_atom
         defaults = self.all_defaults
-        self.Atom = make_class(class_name, slots, defaults=defaults)
+        self.Atom = _make_class(class_name, slots, defaults=defaults)
         return
         
     def atom_factory(self):
