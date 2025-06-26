@@ -53,21 +53,18 @@ class Molspace(object):
             of the desired system.
         """
         
-        # kwargs = {'astyles':['full', 'charge'], 'b':2, 'c':3}
         
-        # print('kwargs = ', kwargs)
+        # Get some basic config options from kwargs or setup defaults
+        #print(kwargs)
         
-        # defaults = {'astyles':['all'],
-        #             'b': None,
-        #             'lmp_sections': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']
-        #             }
-        # print('defaults =', defaults)
+        astyles = kwargs.pop('astyles', ['all']) # ['read-atom-style', 'write-atom-style'] or ['read-atom-style']
+        dsect = kwargs.pop('dsect', ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']) # 
+        read = kwargs.pop('read', 'mooonpy')
         
-        # config = {**defaults, **kwargs} 
-        # print('config = ', config)
+        #print(kwargs)
         
         # Build this object with some composition
-        self.atoms: Atoms = Atoms()
+        self.atoms: Atoms = Atoms(astyles)
         self.bonds: Bonds = Bonds()
         self.angles: Angles = Angles()
         self.dihedrals: Dihedrals = Dihedrals()
@@ -78,29 +75,25 @@ class Molspace(object):
         self.filename = filename
         self.header = ''
         if filename:
-            if os.path.exists(filename):
-                self.read_files(filename, **kwargs)
-            else:
+            if not os.path.exists(filename):
                 raise FileNotFoundError(f'{filename} was not found or is a directory')
+                
+            # TODO: Remove LUNAR TESTS
+            if read == 'mooonpy':
+                self.read_files(filename, dsect=dsect)
+            if read == 'lunar':
+                _files_io.read_lmp.Molecule_File(filename, method='forward', sections=dsect)   
+
+                
         
 
         
-    def read_files(self, filename, **kwargs):
-
-        
-        root, ext = os.path.splitext(filename)
-        defaults = {'read':'mooonpy', 'sections':('Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities')}
-        config = {**defaults, **kwargs}        
+    def read_files(self, filename, dsect=['all']):
+        root, ext = os.path.splitext(filename)     
         if filename.endswith('.data'):
-            if 'data_sections' in kwargs:
-                sections = kwargs['data_sections']
-            else:
-                sections = ('Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities')
-            
-            if config['read'] == 'mooonpy':
-                _files_io.read_lmp_data.read(self, filename, sections)
-            else:
-                _files_io.read_lmp.Molecule_File(filename, method='forward', sections=sections)
+            if 'all' in dsect:
+                dsect = ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']
+            _files_io.read_lmp_data.read(self, filename, dsect)
             
         return None
         

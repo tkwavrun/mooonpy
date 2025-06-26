@@ -22,10 +22,10 @@ def int_str(string):
         return string
 
 class Styles:
-    def __init__(self, **kwargs):
+    def __init__(self, astyles):
         
-        # Set up supported styles for LAMMPS and other file formats (NOTE: for LAMMPS 'type' attributes
-        # these can be an int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file).        
+        # Set up supported styles for LAMMPS and other file formats (NOTE: for the LAMMPS 'type' attributes they can be an
+        # int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file - so need to use int_str function).        
         self.read = {}     # {'style' : (int or float or str)}     -> (int or float or str) sets how to read string
         self.styles = {}   # {'style' : (attr1, attr2, ...) }      -> (attr1, attr2, ...) sets attr name (e.g. 'id' 'x')
         self.defaults = {} # {'style'}: (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
@@ -71,31 +71,33 @@ class Styles:
         self.defaults['custom']        = ()
         
         
-        # # Setup which styles should be built when an atom is generated
-        # if 'astyles' in kwargs:
-        #     astyles = kwargs['astyles']
-        #     if isinstance(astyles, (tuple, list)):
-        #         build = tuple(astyles)
-        #     else:
-        #         build = tuple([kwargs['astyles']])
-        # else:
-        #     build = ('all', )
+        # Setup which styles should be built when an atom is generated
+        if isinstance(astyles, (tuple, list)):
+            build = tuple(astyles)
+        else:
+            build = tuple([astyles])
 
         
         # Consolidate all attrs and defaults into a dict and tuple to 
         # be able to initialize an Atom() object as quickly as possible
         self.all_defaults = {} # {'attr-name':default-value}
         for style in self.styles:
-            # if style in build or 'all' in build or style == '_random':
-            #     print('Building style: ', style)
-            attrs = self.styles[style]
-            defaults = self.defaults[style]
-            for attr, default in zip(attrs, defaults):
-                self.all_defaults[attr] = default
+            if style in build or 'all' in build or style.startswith('_'):
+                #print('Building atom style: ', style)
+                attrs = self.styles[style]
+                defaults = self.defaults[style]
+                for attr, default in zip(attrs, defaults):
+                    self.all_defaults[attr] = default
         self.all_per_atom = tuple(self.all_defaults.keys())
-        # print('self.all_per_atom = ', self.all_per_atom)
-        # print('self.all_defaults = ', self.all_defaults)
         
+        
+        # Generate an class Atom that gen_atom() will
+        # use as a blue print for that factory
+        class_name = 'Atom'
+        slots = self.all_per_atom
+        defaults = self.all_defaults
+        self.Atom = make_class(class_name, slots, defaults=defaults)
+
         
     def update_build(self, astyles):
         for style in astyles:
@@ -106,13 +108,13 @@ class Styles:
         self.all_per_atom = tuple(self.all_defaults.keys())
         return
         
-    def gen_atom(self):
-        class_name = 'Atom'
-        slots = self.all_per_atom
-        defaults = self.all_defaults
-        Atom = make_class(class_name, slots, defaults=defaults)
-        atom = Atom()
-        return atom
+    def atom_factory(self):
+        # class_name = 'Atom'
+        # slots = self.all_per_atom
+        # defaults = self.all_defaults
+        # Atom = make_class(class_name, slots, defaults=defaults)
+        #atom = Atom()
+        return self.Atom()
     
     def fill_atom(self, atom, style, data_lst):
         read = self.read[style]

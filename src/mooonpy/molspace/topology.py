@@ -23,13 +23,18 @@ class Bonds(dict):
         super().__init__(**kwargs)
         self.style: str = ''
         
-    def gen_bond(self):
+        
         class_name = 'Bond'
         slots = ('bo', 'type', 'ordered', 'comment')
         defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':''}
-        Bond = make_class(class_name, slots, defaults=defaults)
-        bond = Bond()
-        return bond
+        self.Bond = make_class(class_name, slots, defaults=defaults)
+        
+    def bond_factory(self):
+        # class_name = 'Bond'
+        # slots = ('bo', 'type', 'ordered', 'comment')
+        # defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':''}
+        # Bond = make_class(class_name, slots, defaults=defaults)
+        return self.Bond()
     
     
 class Angles(dict):    
@@ -37,13 +42,18 @@ class Angles(dict):
         super().__init__(**kwargs)
         self.style: str = ''
         
-    def gen_angle(self):
+        
         class_name = 'Angle'
         slots = ('type', 'ordered', 'comment')
         defaults = {'type':0, 'ordered':[], 'comment':''}
-        Angle = make_class(class_name, slots, defaults=defaults)
-        angle = Angle()
-        return angle
+        self.Angle = make_class(class_name, slots, defaults=defaults)
+        
+    def angle_factory(self):
+        # class_name = 'Angle'
+        # slots = ('type', 'ordered', 'comment')
+        # defaults = {'type':0, 'ordered':[], 'comment':''}
+        # Angle = make_class(class_name, slots, defaults=defaults)
+        return self.Angle()
 
 
 class Dihedrals(dict):    
@@ -51,13 +61,17 @@ class Dihedrals(dict):
         super().__init__(**kwargs)
         self.style: str = ''
         
-    def gen_dihedral(self):
         class_name = 'Dihedral'
         slots = ('type', 'ordered', 'comment')
         defaults = {'type':0, 'ordered':[], 'comment':''}
-        Dihedral = make_class(class_name, slots, defaults=defaults)
-        dihedral = Dihedral()
-        return dihedral
+        self.Dihedral = make_class(class_name, slots, defaults=defaults)
+        
+    def dihedral_factory(self):
+        # class_name = 'Dihedral'
+        # slots = ('type', 'ordered', 'comment')
+        # defaults = {'type':0, 'ordered':[], 'comment':''}
+        # Dihedral = make_class(class_name, slots, defaults=defaults)
+        return self.Dihedral()
 
 
 class Impropers(dict):    
@@ -65,13 +79,18 @@ class Impropers(dict):
         super().__init__(**kwargs)
         self.style: str = ''
         
-    def gen_improper(self):
+        
         class_name = 'Improper'
         slots = ('type', 'ordered', 'comment')
         defaults = {'type':0, 'ordered':[], 'comment':''}
-        Improper = make_class(class_name, slots, defaults=defaults)
-        improper = Improper()
-        return improper
+        self.Improper = make_class(class_name, slots, defaults=defaults)
+        
+    def improper_factory(self):
+        # class_name = 'Improper'
+        # slots = ('type', 'ordered', 'comment')
+        # defaults = {'type':0, 'ordered':[], 'comment':''}
+        # Improper = make_class(class_name, slots, defaults=defaults)
+        return self.Improper()
 
 
 

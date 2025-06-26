@@ -25,16 +25,34 @@ def read(mol, filename, sections):
     
     
     # Create shortcuts to all the generation factories for speed and ease of use
-    atom_factory = mol.atoms.styles.gen_atom
-    bond_factory = mol.bonds.gen_bond()
-    angle_factory = mol.angles.gen_angle()
-    dihedral_factory = mol.dihedrals.gen_dihedral()
-    improper_factory = mol.impropers.gen_improper()
+    atom_factory = mol.atoms.styles.atom_factory
+    bond_factory = mol.bonds.bond_factory
+    angle_factory = mol.angles.angle_factory
+    dihedral_factory = mol.dihedrals.dihedral_factory
+    improper_factory = mol.impropers.improper_factory
+    coeffs_factory = mol.ff.coeffs_factory
     
         
     # Find "hard coded" atom style reads for performance and set atom_reader to slow and update later on
     hard_coded_atom_reading_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('read_')}
     atom_reader = mol.atoms.styles.fill_atom
+    
+    
+    # Setup defaults
+    natoms: int = 0
+    nbonds: int = 0
+    nangles: int = 0
+    ndihedrals: int = 0
+    nimpropers: int = 0
+    
+    natomtypes: int = 0
+    nbondstypes: int = 0
+    nangletypess: int = 0
+    ndihedralstypes: int = 0
+    nimproperstypes: int = 0
+    
+    # Setup list to hold atoms, bonds, etc objects
+    atom_objects: list[object] = []
     
     
     # Open and read contents from file
@@ -76,7 +94,8 @@ def read(mol, filename, sections):
             #    the entire strech of the large sections            #
             #-------------------------------------------------------#
             if section == 'Atoms':
-                atom = atom_factory() #mol.atoms.styles.gen_atom()
+                atom = atom_factory()
+                #atom = atom_objects.pop()
                 atom = atom_reader(atom, mol.atoms.style, data_lst)
                 atom.comment = comment
                 mol.atoms[atom.id] = atom
@@ -88,7 +107,7 @@ def read(mol, filename, sections):
                 id2 = int(data_lst[3])
                 ordered = (id1, id2)
                 
-                bond = bond_factory #mol.bonds.gen_bond()
+                bond = bond_factory()
                 bond.ordered = list(ordered) #[id1, id2]
                 bond.comment = comment
                 bond.type = typeID
@@ -102,7 +121,7 @@ def read(mol, filename, sections):
                 id3 = int(data_lst[4])
                 ordered = (id1, id2, id3)
                 
-                angle = angle_factory #mol.angles.gen_angle()
+                angle = angle_factory() #mol.angles.gen_angle()
                 angle.ordered = list(ordered) #[id1, id2, id3]
                 angle.comment = comment
                 angle.type = typeID
@@ -117,7 +136,7 @@ def read(mol, filename, sections):
                 id4 = int(data_lst[5])
                 ordered = (id1, id2, id3, id4)
                 
-                dihedral = dihedral_factory #mol.dihedrals.gen_dihedral()
+                dihedral = dihedral_factory()
                 dihedral.ordered = list(ordered) #[id1, id2, id3, id4]
                 dihedral.comment = comment
                 dihedral.type = typeID
@@ -132,7 +151,7 @@ def read(mol, filename, sections):
                 id4 = int(data_lst[5])
                 ordered = (id1, id2, id3, id4)
                 
-                improper = improper_factory #mol.impropers.gen_improper()
+                improper = improper_factory() 
                 improper.ordered = list(ordered) #[id1, id2, id3, id4]
                 improper.comment = comment
                 improper.type = typeID
@@ -144,7 +163,7 @@ def read(mol, filename, sections):
                 typeID = int(data_lst[0])
                 type_label = str(data_lst[1])
                 
-                params = ff_coeffs.gen_params()
+                params = coeffs_factory()
                 params.comment = type_label
                 params.type_label = type_label
                 ff_coeffs[typeID] = params
@@ -168,26 +187,67 @@ def read(mol, filename, sections):
                         type_label = str(typeID)
                         
                     # Generate a params instance and add to it 
-                    params = ff_coeffs.gen_params(coeffs)
+                    params = coeffs_factory(coeffs)
                     params.comment = comment
                     params.type_label = type_label
                     ff_coeffs[typeID] = params  
+                    
+                    
+            # Get number of atoms, bonds, types, ...
+            elif data_str.endswith('atoms'):
+                natoms = int(data_lst[0])
+                #atom_objects = [atom_factory() for _ in range(natoms)]
+                continue
+            elif data_str.endswith('bonds'):
+                nbonds = int(data_lst[0])
+                continue
+            elif data_str.endswith('angles'):
+                nangles = int(data_lst[0])
+                continue
+            elif data_str.endswith('dihedrals'):
+                ndihedrals = int(data_lst[0])
+                continue
+            elif data_str.endswith('impropers'):
+                nimpropers = int(data_lst[0])
+                continue
+                
+            elif data_str.endswith('atom types'):
+                natomtypes = int(data_lst[0])
+                continue
+            elif data_str.endswith('bond types'):
+                nbondtypes = int(data_lst[0])
+                continue
+            elif data_str.endswith('angle types'):
+                nangletypes = int(data_lst[0])
+                continue
+            elif data_str.endswith('dihedral types'):
+                ndihedraltypes = int(data_lst[0])
+                continue
+            elif data_str.endswith('improper types'):
+                nimpropertypes = int(data_lst[0])
+                continue
                    
             # Get box dimensions
             elif 'xlo' in data_str and 'xhi' in data_str:
                 mol.atoms.box.xlo = float(data_lst[0]) 
                 mol.atoms.box.xhi = float(data_lst[1]) 
+                continue
             elif 'ylo' in data_str and 'yhi' in data_str:
                 mol.atoms.box.ylo = float(data_lst[0]) 
                 mol.atoms.box.yhi = float(data_lst[1]) 
+                continue
             elif 'zlo' in data_str and 'zhi' in data_str:
                 mol.atoms.box.zlo = float(data_lst[0]) 
                 mol.atoms.box.zhi = float(data_lst[1]) 
+                continue
             elif 'xy' in data_str and 'xz' in data_str and 'yz' in data_str:
                 mol.atoms.box.xy = float(data_lst[0]) 
                 mol.atoms.box.xz = float(data_lst[1]) 
-                mol.atoms.box.yz = float(data_lst[2])               
-            elif n == 0: mol.header = string
+                mol.atoms.box.yz = float(data_lst[2]) 
+                continue
+            elif n == 0: 
+                mol.header = string
+                continue
 
                 
             #-----------------------------------------------------------------#
@@ -318,29 +378,29 @@ def read(mol, filename, sections):
         print('\n\nAtoms')
         for n, (key, value) in enumerate(mol.atoms.items()):
             if n < 5:
-                print(key, value.type, value.x, value.y, value.z, value.comment, value.element)
+                print(key, value.type, value.x, value.y, value.z, value.comment, value.element, id(value))
         # line = mol.atoms.styles.gen_line(mol.atoms[1], style='body')
         # print(line)
         
         print('\n\nBonds')
         for n, (key, value) in enumerate(mol.bonds.items()):
             if n < 5:
-                print(key, value.type, value.ordered, value.bo, value.comment)
+                print(key, value.type, value.ordered, value.bo, value.comment, id(value))
                 
         print('\n\nAngles')
         for n, (key, value) in enumerate(mol.angles.items()):
             if n < 5:
-                print(key, value.type, value.ordered, value.comment)
+                print(key, value.type, value.ordered, value.comment, id(value))
                 
         print('\n\nDihedrals')
         for n, (key, value) in enumerate(mol.dihedrals.items()):
             if n < 5:
-                print(key, value.type, value.ordered, value.comment)
+                print(key, value.type, value.ordered, value.comment, id(value))
                 
         print('\n\nImpropers')
         for n, (key, value) in enumerate(mol.impropers.items()):
             if n < 5:
-                print(key, value.type, value.ordered, value.comment)
+                print(key, value.type, value.ordered, value.comment, id(value))
         
         d = mol.ff.masses
         # d = mol.ff.pair_coeffs

@@ -13,9 +13,7 @@ class Coefficients(dict):
         super().__init__(*args, **kwargs)
         self.style: str = ''
         
-    def gen_params(self, coeffs=None):
-        if coeffs is None: coeffs = []
-        return Parameters(coeffs)
+
 
 
 class ForceField(object):
@@ -37,5 +35,10 @@ class ForceField(object):
         self.bondbond13_coeffs: Coefficients = Coefficients() # {type : Parameters-object}        
         self.angletorsion_coeffs: Coefficients = Coefficients() # {type : Parameters-object}
         self.angleangle_coeffs: Coefficients = Coefficients() # {type : Parameters-object}
+        
+        
+    def coeffs_factory(self, coeffs=None):
+        if coeffs is None: coeffs = []
+        return Parameters(coeffs)
 
         
