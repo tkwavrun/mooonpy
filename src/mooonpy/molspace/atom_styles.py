@@ -25,7 +25,18 @@ class Styles:
     def __init__(self, astyles):
         
         # Set up supported styles for LAMMPS and other file formats (NOTE: for the LAMMPS 'type' attributes they can be an
-        # int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file - so need to use int_str function).        
+        # int or str due to type labels in a LAMMPS datafile or LAMMPS molecule file - so need to use int_str function).  
+        #
+        # The self.read, self.styles, and self.defaults dictionaries are meant to provide very easy general purpose way
+        # to extend the ability to read and write LAMMPS styles. However, due to the general purpose nature they are not
+        # as quick as they could be. Therefore can be "hard coded" ways to read and write for speed purposes. These will
+        # be set as functions with the names:
+        #    def read_STYLE(self, atom, style, data_lst):
+        #    def line_STYLE(self, atom, style):
+        # where STYLE in def *_STYLE() is a LAMMPS style (e.g. def read_full(), will be the hard coded reader to the
+        # LAMMPS 'full' atom style). *NOTE: to support any LAMMPS style that style key needs to be in self.read, self.styles,
+        # and self.defaults dictionaries, even if "hard coded" readers and writers are generated - this is because this
+        # will tell the code how to generate an instance of the Atom class, with necessary __slots__ and defaults.*
         self.read = {}     # {'style' : (int or float or str)}     -> (int or float or str) sets how to read string
         self.styles = {}   # {'style' : (attr1, attr2, ...) }      -> (attr1, attr2, ...) sets attr name (e.g. 'id' 'x')
         self.defaults = {} # {'style'}: (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
@@ -100,7 +111,7 @@ class Styles:
         self.Atom = make_class(class_name, slots, defaults=defaults)
 
         
-    def update_build(self, astyles):
+    def update_astyles(self, astyles):
         # Update defaults
         for style in astyles:
             attrs = self.styles[style]
@@ -127,7 +138,7 @@ class Styles:
             setattr(atom, attr, value)
         return atom
     
-    def read_full1(self, atom, style, data_lst):
+    def read_full(self, atom, style, data_lst):
         atom.id = int(data_lst[0])
         atom.molid = int(data_lst[1])
         atom.type = int(data_lst[2])
@@ -135,7 +146,29 @@ class Styles:
         atom.x = float(data_lst[4])
         atom.y = float(data_lst[5])
         atom.z = float(data_lst[6])
-        atom.ix = int(data_lst[7])
-        atom.iy = int(data_lst[8])
-        atom.iz = int(data_lst[9])
+        try:
+            atom.ix = int(data_lst[7])
+            atom.iy = int(data_lst[8])
+            atom.iz = int(data_lst[9])
+        except:
+            atom.ix = 0
+            atom.iy = 0
+            atom.iz = 0
+        return atom
+    
+    def read_charge(self, atom, style, data_lst):
+        atom.id = int(data_lst[0])
+        atom.type = int(data_lst[1])
+        atom.q = float(data_lst[2])
+        atom.x = float(data_lst[3])
+        atom.y = float(data_lst[4])
+        atom.z = float(data_lst[5])
+        try:
+            atom.ix = int(data_lst[6])
+            atom.iy = int(data_lst[7])
+            atom.iz = int(data_lst[8])
+        except:
+            atom.ix = 0
+            atom.iy = 0
+            atom.iz = 0
         return atom
