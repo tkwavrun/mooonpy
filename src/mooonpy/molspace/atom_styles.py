@@ -120,14 +120,14 @@ class Styles:
         return self.Atom()
     
     def fill_atom(self, atom, style, data_lst):
-        read = self.read[style]
-        order = self.styles[style]
-        for string, attr, func in zip(data_lst, order, read):
+        reader = self.read[style]
+        attrs = self.styles[style]
+        for string, attr, func in zip(data_lst, attrs, reader):
             value = func(string)
             setattr(atom, attr, value)
         return atom
     
-    def read_full(self, atom, style, data_lst):
+    def read_full1(self, atom, style, data_lst):
         atom.id = int(data_lst[0])
         atom.molid = int(data_lst[1])
         atom.type = int(data_lst[2])
