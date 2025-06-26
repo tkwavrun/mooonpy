@@ -297,15 +297,6 @@ def read(mol, filename, sections):
                     ff_coeffs = None
             
 
-
-
-                
-
-                
-            
-
-            
-
     print_info = False
     #print_info = True
     if print_info:

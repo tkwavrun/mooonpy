@@ -29,8 +29,8 @@ class Styles:
         #
         # The self.read, self.styles, and self.defaults dictionaries are meant to provide very easy general purpose way
         # to extend the ability to read and write LAMMPS styles. However, due to the general purpose nature they are not
-        # as quick as they could be. Therefore can be "hard coded" ways to read and write for speed purposes. These will
-        # be set as functions with the names:
+        # as quick as they could be. Therefore "hard coded" ways to read and write for speed purposes can be added. These
+        # will be set as functions with the names:
         #    def read_STYLE(self, atom, style, data_lst):
         #    def line_STYLE(self, atom, style):
         # where STYLE in def *_STYLE() is a LAMMPS style (e.g. def read_full(), will be the hard coded reader to the
@@ -39,7 +39,7 @@ class Styles:
         # will tell the code how to generate an instance of the Atom class, with necessary __slots__ and defaults.*
         self.read = {}     # {'style' : (int or float or str)}     -> (int or float or str) sets how to read string
         self.styles = {}   # {'style' : (attr1, attr2, ...) }      -> (attr1, attr2, ...) sets attr name (e.g. 'id' 'x')
-        self.defaults = {} # {'style'}: (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
+        self.defaults = {} # {'style' : (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
         
         self.read['angle']             = (int,  int,    _int_str, float, float, float, int,  int,  int)
         self.styles['angle']           = ('id', 'molid', 'type',  'x',   'y',   'z',   'ix', 'iy', 'iz')

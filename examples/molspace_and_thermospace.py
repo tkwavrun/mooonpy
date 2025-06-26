@@ -42,7 +42,7 @@ if __name__ == '__main__':
     file = 'EPON_862/detda_typed_IFF_merged.data'
     file = 'EPON_862/system1_cell_replicate.data'
     def call_mooonpy():
-        m = mooonpy.Molspace(filename=file, read='mooonpy', astyles=['full', 'all1'])
+        m = mooonpy.Molspace(filename=file, read='mooonpy', astyles=['all'])
         # i = 1
         # print(m.atoms[i].comment, m.atoms[i].diameter)
     
