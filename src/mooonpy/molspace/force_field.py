@@ -14,8 +14,6 @@ class Coefficients(dict):
         self.style: str = ''
         
 
-
-
 class ForceField(object):
     def __init__(self, **kwargs):
         # Build this object with some composition

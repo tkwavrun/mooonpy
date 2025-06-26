@@ -3,7 +3,7 @@
 
 
 
-def make_class(class_name, slots, defaults=None):
+def _make_class(class_name, slots, defaults=None):
     defaults = defaults or {}
     
     class Dynamic:
@@ -29,7 +29,7 @@ class Bonds(dict):
         class_name = 'Bond'
         slots = ('bo', 'type', 'ordered', 'comment')
         defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':''}
-        self.Bond = make_class(class_name, slots, defaults=defaults)
+        self.Bond = _make_class(class_name, slots, defaults=defaults)
         
     def bond_factory(self):
         return self.Bond()
@@ -45,7 +45,7 @@ class Angles(dict):
         class_name = 'Angle'
         slots = ('type', 'ordered', 'comment')
         defaults = {'type':0, 'ordered':[], 'comment':''}
-        self.Angle = make_class(class_name, slots, defaults=defaults)
+        self.Angle = _make_class(class_name, slots, defaults=defaults)
         
     def angle_factory(self):
         return self.Angle()
@@ -61,7 +61,7 @@ class Dihedrals(dict):
         class_name = 'Dihedral'
         slots = ('type', 'ordered', 'comment')
         defaults = {'type':0, 'ordered':[], 'comment':''}
-        self.Dihedral = make_class(class_name, slots, defaults=defaults)
+        self.Dihedral = _make_class(class_name, slots, defaults=defaults)
         
     def dihedral_factory(self):
         return self.Dihedral()
@@ -77,7 +77,7 @@ class Impropers(dict):
         class_name = 'Improper'
         slots = ('type', 'ordered', 'comment')
         defaults = {'type':0, 'ordered':[], 'comment':''}
-        self.Improper = make_class(class_name, slots, defaults=defaults)
+        self.Improper = _make_class(class_name, slots, defaults=defaults)
         
     def improper_factory(self):
         return self.Improper()
