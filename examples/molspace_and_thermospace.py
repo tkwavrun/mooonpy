@@ -58,6 +58,12 @@ if __name__ == '__main__':
     lunar_time = timeit.timeit(stmt=call_lunar, number=number)
     print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
     
+    def perf(old, new):
+        return 100*(old-new)/new
+    
+    print('\n\n')
+    print(f'Percent increase in performance  : {perf(lunar_time, mooonpy_time)} % for {number} runs on 100,000 atom system')
+    
     
     # class A:
     #     def __init__(self, **kwargs):
