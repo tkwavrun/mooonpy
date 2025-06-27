@@ -36,7 +36,7 @@ class Elements:
         
         
         hydrogen = Element()
-        hydrogen.masses = [1.008, 1.0] # 10.01115 is for IFF's cg1/cge atom types
+        hydrogen.masses = [1.008, 1.0] # 1.0 is for IFF's cg1/cge atom types
         hydrogen.radii = {'calculated': 0.53,
                           'empirical':  0.25,
                           'covalent':   0.37,
@@ -67,4 +67,4 @@ print(carbon.masses, carbon.radii)
 print('\n\nMapping mass to element')
 print(pt.mass2element(12))
 print(pt.element2mass('H'))
-print(pt.element2radii('H'))
+print(pt.element2radii('C'))
