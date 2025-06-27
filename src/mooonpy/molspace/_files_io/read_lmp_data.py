@@ -1,27 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...tools import file_utils
-import re
-
-
-def _is_float(string):
-    float_re = re.compile(r'^-?\d+(\.\d+)?([eE][-+]?\d+)?$')
-    return bool(float_re.match(string))
-
-
-def _int_str(string):
-    if string.isnumeric():
-        return int(string)
-    else:
-        return string
-
-    
-def _int_str_float(string):
-    if string.isnumeric():
-        return int(string)
-    elif _is_float(string):
-        return float(string)
-    else:
-        return string
+from ...tools import string_utils
 
 
 
@@ -112,7 +91,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Bonds':
                 #nid = int(data_lst[0])
-                type_id = _int_str_float(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 ordered = (id1, id2)
@@ -125,7 +104,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Angles':
                 #nid = int(data_lst[0])
-                type_id = _int_str_float(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -139,7 +118,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Dihedrals':
                 #nid = int(data_lst[0])
-                type_id = _int_str_float(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -154,7 +133,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Impropers':
                 #nid = int(data_lst[0])
-                type_id = _int_str_float(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -183,7 +162,7 @@ def read(mol, filename, sections):
             # ff_coeffs build - if not one will be initialized here)
             elif section in sections_coeffs and ff_coeffs is not None:
                 #print(n, line, section)
-                digits = [_int_str_float(string) for string in data_lst]
+                digits = [string_utils.string2digit(string) for string in data_lst]
                 typeID = digits[0]
                 coeffs = digits[1:]
                 if typeID in ff_coeffs:

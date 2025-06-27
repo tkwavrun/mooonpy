@@ -46,9 +46,9 @@ def write(mol, filename):
                        }
         
         
-        styles = {'bond_coeffs': {'name':'bond_style', 'per-line':set(['morse'])},
-                  'angle_coeffs': {'name':'angle_style', 'per-line':set(['class2xe'])},
-                  'dihedral_coeffs': {'name':'dihedral_style', 'per-line':set(['class2xe'])},
+        styles = {'bond_coeffs': {'name':'bond_style', 'per-line':set([])},
+                  'angle_coeffs': {'name':'angle_style', 'per-line':set([])},
+                  'dihedral_coeffs': {'name':'dihedral_style', 'per-line':set([])},
                   'improper_coeffs': {'name':'improper_style', 'per-line':set([])},
                   
                   'pair_coeffs': {'name':'pair_style', 'per-line':set([])}

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from typing import Union
-
+import numpy as np
 
 def is_float(string: str) -> bool:
     """
@@ -32,3 +32,19 @@ def string2digit(string: str) -> Union[int, str, float]:
         return float(string)
     else:
         return string
+
+def _col_convert(column,skip_int=False):
+    try:
+        column = np.array(column, float)  ## convert from string. This is about half the runtime
+    except:
+        raise Exception(f'Column not convertable to floats: {column}')
+    if skip_int: return column # cannot convert to int, throws warning if the next line executes with a nan
+    col_int = column.astype(int)  # convert to int array. exact up to 9 quadrillion
+    if np.all(column == col_int): # can't find a faster way to do this, it gets all truth values first, but it really should have a breakout for first float found, but the C functions are fast
+        return col_int
+    else:
+        return column
+    # for f_col,i_col in zip(column,col_int): # not faster, probably loop setup
+    #     if f_col != i_col:
+    #         return column
+    # return col_int
