@@ -59,22 +59,22 @@ def read(mol, filename, sections):
             
             # Deal with comments
             elif '#' in string:
-                line = string.split('#')
+                line = string.partition('#')
                 data_str = line[0].strip()
                 data_lst = data_str.split()
-                comment = line[1].strip()
+                comment = line[2].strip()
             else:
                 data_str = string.strip()
                 data_lst = data_str.split()
                 comment = ''
 
-            
+
             #-------------------------------------------------------#
-            # Parse the computationally heavy parts 1st:            #
-            #  - setting the section requires looking at each line  #
-            #  - if we already know the section we can get extra    #
-            #    performance by not having to set section flag for  #
-            #    the entire strech of the large sections            #
+            # Parse the computationally heavy parts 1st:
+            #  - setting the section requires looking at each line
+            #  - if we already know the section we can get extra
+            #    performance by not having to set section flag for
+            #    the entire stretch of the large sections
             #-------------------------------------------------------#
             if section == 'Atoms':
                 atom = atom_factory()
@@ -82,9 +82,20 @@ def read(mol, filename, sections):
                 atom.comment = comment
                 mol.atoms[atom.id] = atom
                 
+            elif section == 'Velocities':
+                nid = int(data_lst[0])
+                vx = float(data_lst[1])
+                vy = float(data_lst[2])
+                vz = float(data_lst[3])
+                
+                atom = mol.atoms[nid]
+                atom.vx = vx
+                atom.vy = vy
+                atom.vz = vz
+                
             elif section == 'Bonds':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 ordered = (id1, id2)
@@ -92,26 +103,26 @@ def read(mol, filename, sections):
                 bond = bond_factory()
                 bond.ordered = list(ordered) #[id1, id2]
                 bond.comment = comment
-                bond.type = typeID
+                bond.type = type_id
                 mol.bonds[ordered] = bond
                 
             elif section == 'Angles':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
                 ordered = (id1, id2, id3)
                 
-                angle = angle_factory() #mol.angles.gen_angle()
+                angle = angle_factory()
                 angle.ordered = list(ordered) #[id1, id2, id3]
                 angle.comment = comment
-                angle.type = typeID
+                angle.type = type_id
                 mol.angles[ordered] = angle
                 
             elif section == 'Dihedrals':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -121,12 +132,12 @@ def read(mol, filename, sections):
                 dihedral = dihedral_factory()
                 dihedral.ordered = list(ordered) #[id1, id2, id3, id4]
                 dihedral.comment = comment
-                dihedral.type = typeID
+                dihedral.type = type_id
                 mol.dihedrals[ordered] = dihedral
                 
             elif section == 'Impropers':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -136,7 +147,7 @@ def read(mol, filename, sections):
                 improper = improper_factory() 
                 improper.ordered = list(ordered) #[id1, id2, id3, id4]
                 improper.comment = comment
-                improper.type = typeID
+                improper.type = type_id
                 mol.impropers[ordered] = improper
             
             
@@ -198,12 +209,12 @@ def read(mol, filename, sections):
 
                 
             #-----------------------------------------------------------------#
-            # Toggle between sections. Toggling is expensive:                 #
-            #  - Requires each line to be check, which means every line in    #
-            #    Atoms, Bond, ... etc needs to be checked                     #
-            #  - If we use wise if/elif settings, once the Atoms, Bonds, ...  #
-            #    etc sections have been found we do not have to check         #
-            #    if data_str is a section to parse                            #
+            # Toggle between sections. Toggling is expensive:                 
+            #  - Requires each line to be check, which means every line in    
+            #    Atoms, Bond, ... etc needs to be checked                     
+            #  - If we use wise if/elif settings, once the Atoms, Bonds, ...  
+            #    etc sections have been found we do not have to check         
+            #    if data_str is a section to parse                            
             #-----------------------------------------------------------------#
             #elif data_str in sections_all:
             elif data_str[0].isalpha():
@@ -303,7 +314,7 @@ def read(mol, filename, sections):
             
 
     print_info = False
-    print_info = True
+    #print_info = True
     if print_info:
         print('\n\n\nSTYLES:')
         print('header: ', mol.header[:50])

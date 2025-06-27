@@ -81,6 +81,9 @@ class Molspace(object):
                 raise FileNotFoundError(f'{filename} was not found or is a directory')
             
             self.read_files(filename, dsect=self.dsect) 
+            
+    
+        #keys = self.bonds
 
                 
         

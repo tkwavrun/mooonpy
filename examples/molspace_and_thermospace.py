@@ -27,13 +27,13 @@ import mooonpy
 
 
 file = 'EPON_862/all2lmp_Outputs/detda_typed_IFF.data'
-#file = 'EPON_862/Graphite_AB_relaxed.data'
+file = 'EPON_862/Graphite_AB_relaxed.data'
 #file = 'EPON_862/detda_typed_IFF_merged.data'
 
 #file = 'EPON_862/Cellulose-supercell_morse_IFF.data'
 #file = 'EPON_862/system1_cell_replicate.data'
 
-molecule = mooonpy.Molspace(filename=file, astyles=['full', 'all1'], dsect=['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'])
+molecule = mooonpy.Molspace(filename=file, astyles=['full', 'charge'], dsect=['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'])
 molecule.write_files('WRITE.data', atom_style='full')
 
 

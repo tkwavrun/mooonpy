@@ -27,7 +27,7 @@ class Bonds(dict):
         # Generate an Bond class with necessary slots and defaults, which will
         # be used by bond_factory() method to generate an instance of this class
         class_name = 'Bond'
-        defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':'', 'dist':0.0}
+        defaults = {'bo':0.0, 'type':0, 'ordered':[], 'comment':'', 'dist':None, 'vect':None}
         slots = tuple(defaults.keys())
         self.Bond = _make_class(class_name, slots, defaults=defaults)
         
@@ -43,7 +43,7 @@ class Angles(dict):
         # Generate an Angle class with necessary slots and defaults, which will
         # be used by angle_factory() method to generate an instance of this class
         class_name = 'Angle'
-        defaults = {'type':0, 'ordered':[], 'comment':'', 'theta':0.0}
+        defaults = {'type':0, 'ordered':[], 'comment':'', 'theta':None}
         slots = tuple(defaults.keys())
         self.Angle = _make_class(class_name, slots, defaults=defaults)
         
@@ -59,7 +59,7 @@ class Dihedrals(dict):
         # Generate an Dihedral class with necessary slots and defaults, which will
         # be used by dihedral_factory() method to generate an instance of this class
         class_name = 'Dihedral'
-        defaults = {'type':0, 'ordered':[], 'comment':'', 'phi':0.0}
+        defaults = {'type':0, 'ordered':[], 'comment':'', 'phi':None}
         slots = tuple(defaults.keys())
         self.Dihedral = _make_class(class_name, slots, defaults=defaults)
         
@@ -75,7 +75,7 @@ class Impropers(dict):
         # Generate an Improper class with necessary slots and defaults, which will
         # be used by improper_factory() method to generate an instance of this class
         class_name = 'Improper'
-        defaults = {'type':0, 'ordered':[], 'comment':'', 'chi':0.0}
+        defaults = {'type':0, 'ordered':[], 'comment':'', 'chi':None}
         slots = tuple(defaults.keys())
         self.Improper = _make_class(class_name, slots, defaults=defaults)
         

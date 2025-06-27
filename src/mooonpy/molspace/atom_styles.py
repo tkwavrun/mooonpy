@@ -1,4 +1,26 @@
 # -*- coding: utf-8 -*-
+import re
+
+
+def is_float(string):
+    float_re = re.compile(r'^-?\d+(\.\d+)?([eE][-+]?\d+)?$')
+    return bool(float_re.match(string))
+
+
+def _int_str(string):
+    if string.isnumeric():
+        return int(string)
+    else:
+        return string
+
+    
+def _int_str_float(string):
+    if string.isnumeric():
+        return int(string)
+    elif is_float(string):
+        return float(string)
+    else:
+        return string
 
 
 def _make_class(class_name, slots, defaults=None):
@@ -15,11 +37,6 @@ def _make_class(class_name, slots, defaults=None):
     Dynamic.__name__ = class_name
     return Dynamic
 
-def _int_str(string):
-    if string.isnumeric():
-        return int(string)
-    else:
-        return string
 
 class Styles:
     def __init__(self, astyles):
@@ -41,45 +58,97 @@ class Styles:
         self.styles = {}   # {'style' : (attr1, attr2, ...) }      -> (attr1, attr2, ...) sets attr name (e.g. 'id' 'x')
         self.defaults = {} # {'style' : (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
         
-        self.read['angle']             = (int,  int,    _int_str, float, float, float, int,  int,  int)
-        self.styles['angle']           = ('id', 'molid', 'type',  'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['angle']         = ( 0,    0,       0,      0.0,   0.0,   0.0,    0,    0,    0)
-        
-        self.read['atomic']            = (int, _int_str, float, float, float, int,  int,  int)
-        self.styles['atomic']          = ('id', 'type',  'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['atomic']        = ( 0,    0,      0.0,   0.0,   0.0,    0,    0,    0)
-        
-        self.read['body']              = (int, _int_str,  int,        float,  float, float, float, int,  int,  int)
-        self.styles['body']            = ('id', 'type',   'bodyflag', 'mass', 'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['body']          = ( 0,    0,        0,          0.0,   0.0,   0.0,   0.0,   0,    0,     0)
-        
-        self.read['bpm/sphere']        = (int,  int,    _int_str,  float,      float,     float, float, float, int,  int,  int)
-        self.styles['bpm/sphere']      = ('id', 'molid', 'type',   'diameter', 'density', 'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['bpm/sphere']    = ( 0,    0,       0,        0.0,       0.0,       0.0,   0.0,   0.0,    0,    0,   0)
-        
-        self.read['rheo/thermal']      = (int, _int_str, int,      float, float,     float, float, float, int,  int,  int)
-        self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy',  'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['rheo/thermal']  = ( 0,    0,       0,        0.0,   0.0,       0.0,   0.0,   0.0,   0,    0,    0)
-        
-        # self.read[
-        # self.styles[
-        # self.defaults[
-        
-        self.read['full']              = (int,  int,    _int_str, float, float, float, float, int,  int,  int)
-        self.styles['full']            = ('id', 'molid', 'type',  'q',   'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['full']          = ( 0,    0,       0,      0.0,   0.0,   0.0,   0.0,   0,    0,    0)
-        
-        self.read['charge']            = (int, _int_str, float, float, float, float, int,  int,  int)
-        self.styles['charge']          = ('id', 'type',  'q',   'x',   'y',   'z',   'ix', 'iy', 'iz')
-        self.defaults['charge']        = ( 0,    0,      0.0,   0.0,   0.0,   0.0,   0.0,   0,    0)
-        
-        self.read['_random']           = (str,       str,       str,    int,  int,  int)
+        self.styles['angle']           = ('id', 'molid', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['atomic']          = ('id', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['body']            = ('id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['bpm/sphere']      = ('id', 'molid', 'type', 'diameter', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['full']            = ('id', 'molid', 'type', 'q',  'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['charge']          = ('id', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['_random']         = ('comment', 'element', 'name', 'vx', 'vy', 'vz')
-        self.defaults['_random']       = ('',        '',        '',      0,    0,    0)
-        
-        self.read['custom']            = ()
         self.styles['custom']          = ()
-        self.defaults['custom']        = ()
+        #self.styles['_chemistry']      = ('hybrid', 'element', 'rings') # attributte groupings
+        
+
+        # Setup the default values per each attribute
+        defaults = {'id':       0,
+                    'x':        0.0,
+                    'y':        0.0,
+                    'z':        0.0,
+                    'q':        0.0,
+                    'vx':       0.0,
+                    'vy':       0.0,
+                    'vz':       0.0,
+                    'ix':       0,
+                    'iy':       0,
+                    'iz':       0,
+                    'rho':      0.0,
+                    'type':     0,
+                    'mass':     0.0,
+                    'molid':    0,
+                    'energy':   0.0,
+                    'status':   0,
+                    'density':  0.0,
+                    'bodyflag': 0,
+                    'diameter': 0.0,
+                    'comment': '',
+                    'element': '',
+                    'name':    '',
+                    
+                    }
+        
+        # Set the function aliases on how to convert a string from a file
+        # to a python data type, during the reading of a file.
+        func_aliases = {'id':       int,
+                        'x':        float,
+                        'y':        float,
+                        'z':        float,
+                        'q':        float,
+                        'vx':       float,
+                        'vy':       float,
+                        'vz':       float,
+                        'ix':       int,
+                        'iy':       int,
+                        'iz':       int,
+                        'rho':      float,
+                        'type':     _int_str,
+                        'mass':     float,
+                        'molid':    int,
+                        'energy':   float,
+                        'status':   int,
+                        'density':  float,
+                        'bodyflag': int,
+                        'diameter': float,
+                        'comment':  str,
+                        'element':  str,
+                        'name':     str,
+                        }
+        
+        
+        # Build the dictionaries mapping each key/value pair from above into each style 
+        self.read = {}     # {'style' : (int or float or str)}     -> (int or float or str) sets how to read string
+        self.defaults = {} # {'style' : (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
+        for style in self.styles:
+            _defaults, _func_aliases = [], []
+            for attr in self.styles[style]:
+                if attr in defaults:
+                    default = defaults[attr]
+                else:
+                    default = 0
+                    print(f'\nWARNING {__file__}')
+                    print(f'is setting a general default: "{default}" for per-atom attribute: "{attr}"') 
+                _defaults.append(default)
+                    
+                if attr in func_aliases:
+                    func_alias = func_aliases[attr]
+                else:
+                    func_alias = _int_str_float
+                    print(f'\nWARNING {__file__}')
+                    print(f'is setting a general function alias for data type conversions: "{func_alias}" for per-atom attribute: "{attr}"') 
+                _func_aliases.append(func_alias)
+                
+            self.defaults[style] = tuple(_defaults)
+            self.read[style] = tuple(_func_aliases)
         
         
         # Setup which styles should be built when an atom is generated
@@ -101,11 +170,7 @@ class Styles:
                 for attr, default in zip(attrs, defaults):
                     self.all_defaults[attr] = default
         self.all_per_atom = tuple(self.all_defaults.keys())
-        # print()
-        # print('self.all_per_atom = ', self.all_per_atom)
-        # print()
-        # print('self.all_defaults = ', self.all_defaults)
-        
+
         
         # Generate an Atom class with necessary slots and defaults, which will
         # be used by atom_factory() method to generate an instance of this class
@@ -178,8 +243,8 @@ class Styles:
         return atom
     
     def atom_line(self, atom, style):
-        buffer = 2
         attrs = self.styles[style]
+        buffer = 2
         line = ''
         for attr in attrs:
             value = getattr(atom, attr)

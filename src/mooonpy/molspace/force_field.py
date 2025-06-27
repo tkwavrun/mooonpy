@@ -36,7 +36,7 @@ class ForceField(object):
         self.angleangle_coeffs: Coefficients = Coefficients('AngleAngle Coeffs') # {type : Parameters-object}
         
         # Boolean to check if type labels have been read in
-        self.has_type_labels = True #False
+        self.has_type_labels = False
         
         
     def coeffs_factory(self, coeffs=None):

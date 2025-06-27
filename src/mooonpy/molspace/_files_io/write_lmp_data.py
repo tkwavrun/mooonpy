@@ -14,9 +14,9 @@ def string_parameters(coeff):
         if isinstance(i, float):
             string += '{:>16.10f}'.format(i)
         elif isinstance(i, int):
-            string += '{:>16}'.format(i)
+            string += '{:>6}'.format(i)
         else:
-            string += '{:>16}'.format(i)
+            string += '{:>6}'.format(i)
     return string
   
 
@@ -50,7 +50,6 @@ def write(mol, filename, atom_style):
         f.write('{:^16.10f} {:^16.10f} {:^5} {:5}\n'.format(mol.atoms.box.zlo, mol.atoms.box.zhi, 'zlo', 'zhi')) 
         if any([mol.atoms.box.xy, mol.atoms.box.xz, mol.atoms.box.yz]):
             f.write('{:^16.10f} {:^16.10f} {:^16.10f} {} {} {}\n'.format(mol.atoms.box.xy, mol.atoms.box.xz, mol.atoms.box.yz, 'xy', 'xz', 'yz'))
-        f.write('\n')
 
         # Write Atom Type Labels if user wants
         if mol.ff.has_type_labels and mol.ff.masses:
