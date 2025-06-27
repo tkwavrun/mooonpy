@@ -3,6 +3,7 @@ from . import _files_io as _files_io
 from .atoms import Atoms
 from .topology import Bonds, Angles, Dihedrals, Impropers
 from .force_field import ForceField
+from .._config import rcParams
 import os
 
 
@@ -53,6 +54,7 @@ class Molspace(object):
             of the desired system.
         """
         
+        print(rcParams)
         
         # Get some basic config options from kwargs or setup defaults
         #print(kwargs)
