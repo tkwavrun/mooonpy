@@ -37,7 +37,7 @@ file = 'EPON_862/all2lmp_Outputs/detda_typed_IFF.data'
 mooonpy.rcParams['color'] = 'green'
 
 
-molecule = mooonpy.Molspace(filename=file, astyles=['full', 'charge'], dsect=['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'])
+molecule = mooonpy.Molspace(filename=file)#, astyles=['full', 'charge'], dsect=['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'])
 molecule.write_files('WRITE.data', atom_style='full')
 
 
