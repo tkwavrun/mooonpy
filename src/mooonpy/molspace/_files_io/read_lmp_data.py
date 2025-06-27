@@ -200,6 +200,7 @@ def read(mol, filename, sections):
                     params = coeffs_factory(coeffs)
                     params.comment = comment
                     params.type_label = type_label
+                    params.style = ff_coeffs.style
                     ff_coeffs[typeID] = params  
                    
             # Get box dimensions

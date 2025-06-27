@@ -39,6 +39,7 @@ mooonpy.rcParams['color'] = 'green'
 
 molecule = mooonpy.Molspace(filename=file)#, astyles=['full', 'charge'], dsect=['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'])
 molecule.write_files('WRITE.data', atom_style='full')
+molecule.write_files('WRITE.ff.script')
 
 
 

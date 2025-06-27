@@ -16,7 +16,9 @@ class Element:
         self.radii: dict[float] = {'calculated': 0.0,
                                    'empirical':  0.0,
                                    'covalent':   0.0,
-                                   'vdw':        0.0}
+                                   'vdw':        0.0,
+                                   'ff.ReaxFF':  0.0,
+                                   'ff.REBO':    0.0}
         
         # Might not really care about this info
         self.elevels: str = ''
@@ -24,7 +26,7 @@ class Element:
 
 class Elements:
     def __init__(self):
-        self.elements = {} # {'element: Element-object}
+        self.elements = {} # {'element': Element-object}
         
         carbon = Element()
         carbon.masses = [12.011, 10.01115] # 10.01115 is for IFF's cg1/cge atom types
@@ -56,9 +58,6 @@ class Elements:
     
     def element2radii(self, element, method='vdw'):
         return self.elements[element].radii[method]
-        
-    
-    
     
 pt = Elements()
 carbon = pt.elements['C']

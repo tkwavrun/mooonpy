@@ -54,7 +54,7 @@ class Molspace(object):
             of the desired system.
         """
         
-        print(rcParams)
+        #print(rcParams)
         
         # Get some basic config options from kwargs or setup defaults
         #print(kwargs)
@@ -104,5 +104,7 @@ class Molspace(object):
         root, ext = os.path.splitext(filename)     
         if filename.endswith('.data'):
             _files_io.write_lmp_data.write(self, filename, atom_style)
+        if filename.endswith('.ff.script'):
+            _files_io.write_lmp_ff_script.write(self, filename)
         
         

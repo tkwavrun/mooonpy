@@ -41,6 +41,8 @@ _defaults = {'molspace.read.dsect': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'I
              'molspace.write.data.astyle': 'full',
              'molspace.astyles': ['all'],
              
+             'molspace.C.radii.ff.ReaxFF': 1.7,
+             
              'thermospace.read': 'all',
              
              'xrdspace.read': 'all'
