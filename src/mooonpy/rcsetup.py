@@ -4,6 +4,10 @@
 # mooonpy/_config.py
 from collections.abc import MutableMapping
 
+
+# Matplotlib GitHub:
+#    https://github.com/matplotlib/matplotlib/blob/main/lib/matplotlib/rcsetup.py
+#    https://github.com/matplotlib/matplotlib/blob/main/lib/matplotlib/__init__.py
 class RCParams(MutableMapping):
     def __init__(self, defaults):
         self._params = dict(defaults)
@@ -33,11 +37,18 @@ class RCParams(MutableMapping):
         return str(self._params)
 
 # Default parameters
-_defaults = {'color': 'blue',
-             'linewidth': 2,     
-             'fontsize': 12,
-             'molspace.read.dsect': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'],
-             'molspace.astyles': ['all']
+_defaults = {'molspace.read.dsect': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'],
+             'molspace.write.data.astyle': 'full',
+             'molspace.astyles': ['all'],
+             
+             'thermospace.read': 'all',
+             
+             'xrdspace.read': 'all'
 }
 
 rcParams = RCParams(_defaults)
+
+
+if __name__ == "__main__": 
+    print(rcParams.get('help'))
+    print(rcParams.get('molspace.write.data.astyle'))

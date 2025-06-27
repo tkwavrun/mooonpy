@@ -3,7 +3,7 @@ from . import _files_io as _files_io
 from .atoms import Atoms
 from .topology import Bonds, Angles, Dihedrals, Impropers
 from .force_field import ForceField
-from .._config import rcParams
+from ..rcsetup import rcParams
 import os
 
 
@@ -59,8 +59,8 @@ class Molspace(object):
         # Get some basic config options from kwargs or setup defaults
         #print(kwargs)
         
-        self.astyles = kwargs.pop('astyles', ['all', 'full']) # ['read-atom-style', 'write-atom-style'] or ['read-atom-style']
-        self.dsect = kwargs.pop('dsect', ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']) # 
+        self.astyles = kwargs.pop('astyles', rcParams['molspace.astyles'])
+        self.dsect = kwargs.pop('dsect', rcParams['molspace.read.dsect'])
         
         #print(kwargs)
         

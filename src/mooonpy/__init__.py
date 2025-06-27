@@ -6,9 +6,12 @@ import os
 # Generate "aliased" imports
 from .molspace.molspace import Molspace as Molspace
 from .molspace import doc_examples as DocExamples
-from ._config import rcParams
+
 from .thermospace.thermospace import Thermospace as Thermospace ## TDM
 from .tools.file_utils import Path as Path ## TDM
+
+from ._config import rcParams
+from .rcsetup import rcParams
 
 __all__ = ['Molspace',
            'DocExamples',
