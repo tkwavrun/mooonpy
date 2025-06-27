@@ -54,8 +54,9 @@ def write(mol, filename, atom_style):
         # Write Atom Type Labels if user wants
         if mol.ff.has_type_labels and mol.ff.masses:
             f.write('\nAtom Type Labels\n\n')
+            type_ids = sorted(mol.ff.masses.keys())
             used = set()
-            for i in mol.ff.masses:
+            for i in type_ids:
                 coeffs = mol.ff.masses[i]
                 type_label = coeffs.type_label
                 f.write('{:^3} {:^2}\n'.format(i, type_label))
@@ -70,8 +71,9 @@ def write(mol, filename, atom_style):
         # Write Bond Type Labels if user wants
         if mol.ff.has_type_labels and mol.ff.bond_coeffs:
             f.write('\nBond Type Labels\n\n')
+            type_ids = sorted(mol.ff.bond_coeffs.keys())
             used = set()
-            for i in mol.ff.bond_coeffs:
+            for i in type_ids:
                 coeffs = mol.ff.bond_coeffs[i]
                 type_label = coeffs.type_label
                 f.write('{:^3} {:^2}\n'.format(i, type_label))
@@ -86,8 +88,9 @@ def write(mol, filename, atom_style):
         # Write Angle Type Labels if user wants
         if mol.ff.has_type_labels and mol.ff.angle_coeffs:
             f.write('\nAngle Type Labels\n\n')
+            type_ids = sorted(mol.ff.angle_coeffs.keys())
             used = set()
-            for i in mol.ff.angle_coeffs:
+            for i in type_ids:
                 coeffs = mol.ff.angle_coeffs[i]
                 type_label = coeffs.type_label
                 f.write('{:^3} {:^2}\n'.format(i, type_label))
@@ -102,8 +105,9 @@ def write(mol, filename, atom_style):
         # Write Dihedral Type Labels if user wants
         if mol.ff.has_type_labels and mol.ff.dihedral_coeffs:
             f.write('\nDihedral Type Labels\n\n')
+            type_ids = sorted(mol.ff.dihedral_coeffs.keys())
             used = set()
-            for i in mol.ff.dihedral_coeffs:
+            for i in type_ids:
                 coeffs = mol.ff.dihedral_coeffs[i]
                 type_label = coeffs.type_label
                 f.write('{:^3} {:^2}\n'.format(i, type_label))
@@ -118,8 +122,9 @@ def write(mol, filename, atom_style):
         # Write Improper Type Labels if user wants
         if mol.ff.has_type_labels and mol.ff.improper_coeffs:
             f.write('\nImproper Type Labels\n\n')
+            type_ids = sorted(mol.ff.improper_coeffs.keys())
             used = set()
-            for i in mol.ff.improper_coeffs:
+            for i in type_ids:
                 coeffs = mol.ff.improper_coeffs[i]
                 type_label = coeffs.type_label
                 f.write('{:^3} {:^2}\n'.format(i, type_label))
@@ -133,7 +138,8 @@ def write(mol, filename, atom_style):
 
         # Write massses
         f.write('\nMasses\n\n')
-        for i in mol.ff.masses: 
+        type_ids = sorted(mol.ff.masses.keys())
+        for i in type_ids: 
             coeff = mol.ff.masses[i]
             parms = coeff.coeffs
             if coeff.comment:
@@ -173,6 +179,16 @@ def write(mol, filename, atom_style):
                 style_hint = '# {}'.format(mol.atoms.style)
             else: style_hint = ''
             f.write('\nAtoms {}\n\n'.format(style_hint))  
+
+            
+            # Setup the atom line generation script
+            hard_coded_atom_line_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('line_')}
+            atom_line = mol.atoms.styles.atom_line
+            if atom_style in hard_coded_atom_line_styles:
+                line_name = hard_coded_atom_line_styles[atom_style]
+                atom_line = getattr(mol.atoms.styles, line_name)
+            
+            # Finally write the atoms
             atoms = sorted(mol.atoms.keys())
             for i in atoms:
                 atom = mol.atoms[i]
@@ -181,7 +197,7 @@ def write(mol, filename, atom_style):
                     comment = '# {}'.format(atom.comment)
                 else: comment = ''
                 
-                line = mol.atoms.styles.atom_line(atom, style=atom_style)
+                line = atom_line(atom, style=atom_style)
                 f.write('{} {}\n'.format(line, comment))
                 
             f.write('\nVelocities\n\n')            

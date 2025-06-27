@@ -27,7 +27,7 @@ import mooonpy
 
 
 file = 'EPON_862/all2lmp_Outputs/detda_typed_IFF.data'
-file = 'EPON_862/Graphite_AB_relaxed.data'
+#file = 'EPON_862/Graphite_AB_relaxed.data'
 #file = 'EPON_862/detda_typed_IFF_merged.data'
 
 #file = 'EPON_862/Cellulose-supercell_morse_IFF.data'

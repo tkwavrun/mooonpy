@@ -262,6 +262,16 @@ class Styles:
             line += string
         return line
     
+    def line_full(self, atom, style):
+        pos = '{:^20.16f} {:^20.16f} {:^20.16f}'.format(atom.x, atom.y, atom.z)
+        image = '{:^2} {:^2} {:^2}'.format(atom.ix, atom.iy, atom.iz)
+        
+        line = '{:^6} {:^4} {:^2} {:^20.16f} {} {}'.format(atom.id, atom.molid, atom.type, atom.q, pos, image)
+        return line
     
-    def line_full(self):
-        return
+    def line_charge(self, atom, style):
+        pos = '{:^20.16f} {:^20.16f} {:^20.16f}'.format(atom.x, atom.y, atom.z)
+        image = '{:^2} {:^2} {:^2}'.format(atom.ix, atom.iy, atom.iz)
+        
+        line = '{:^6} {:^4} {:^20.16f} {} {}'.format(atom.id, atom.type, atom.q, pos, image)
+        return line

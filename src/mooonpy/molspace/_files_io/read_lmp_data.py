@@ -333,40 +333,40 @@ def read(mol, filename, sections):
         line = mol.atoms.styles.atom_line(mol.atoms[1], style='full')
         print(line)
         
-        # print('\n\nBonds')
-        # for n, (key, value) in enumerate(mol.bonds.items()):
-        #     if n < 5:
-        #         print(key, value.type, value.ordered, value.bo, value.comment, id(value))
+        print('\n\nBonds')
+        for n, (key, value) in enumerate(mol.bonds.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.bo, value.comment, id(value))
                 
-        # print('\n\nAngles')
-        # for n, (key, value) in enumerate(mol.angles.items()):
-        #     if n < 5:
-        #         print(key, value.type, value.ordered, value.comment, id(value))
+        print('\n\nAngles')
+        for n, (key, value) in enumerate(mol.angles.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.comment, id(value))
                 
-        # print('\n\nDihedrals')
-        # for n, (key, value) in enumerate(mol.dihedrals.items()):
-        #     if n < 5:
-        #         print(key, value.type, value.ordered, value.comment, id(value))
+        print('\n\nDihedrals')
+        for n, (key, value) in enumerate(mol.dihedrals.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.comment, id(value))
                 
-        # print('\n\nImpropers')
-        # for n, (key, value) in enumerate(mol.impropers.items()):
-        #     if n < 5:
-        #         print(key, value.type, value.ordered, value.comment, id(value))
+        print('\n\nImpropers')
+        for n, (key, value) in enumerate(mol.impropers.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.comment, id(value))
         
-        # d = mol.ff.masses
-        # # d = mol.ff.pair_coeffs
-        # # d = mol.ff.bond_coeffs
-        # # d = mol.ff.angle_coeffs
-        # # d = mol.ff.dihedral_coeffs
-        # # d = mol.ff.improper_coeffs
-        # # d = mol.ff.bondbond_coeffs
-        # # d = mol.ff.bondangle_coeffs
-        # # d = mol.ff.angleangletorsion_coeffs
-        # # d = mol.ff.endbondtorsion_coeffs
-        # # d = mol.ff.middlebondtorsion_coeffs
-        # # d = mol.ff.bondbond13_coeffs
-        # # d = mol.ff.angletorsion_coeffs
-        # # d = mol.ff.angleangle_coeffs
-        # print('\n\nFF-CHECK: ', d.style)
-        # for key, value in d.items():
-        #     print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
+        d = mol.ff.masses
+        # d = mol.ff.pair_coeffs
+        # d = mol.ff.bond_coeffs
+        # d = mol.ff.angle_coeffs
+        # d = mol.ff.dihedral_coeffs
+        # d = mol.ff.improper_coeffs
+        # d = mol.ff.bondbond_coeffs
+        # d = mol.ff.bondangle_coeffs
+        # d = mol.ff.angleangletorsion_coeffs
+        # d = mol.ff.endbondtorsion_coeffs
+        # d = mol.ff.middlebondtorsion_coeffs
+        # d = mol.ff.bondbond13_coeffs
+        # d = mol.ff.angletorsion_coeffs
+        # d = mol.ff.angleangle_coeffs
+        print('\n\nFF-CHECK: ', d.style)
+        for key, value in d.items():
+            print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
