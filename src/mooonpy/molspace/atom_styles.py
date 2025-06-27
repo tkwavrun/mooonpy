@@ -75,8 +75,13 @@ class Styles:
         self.styles['line']            = ('id', 'molid', 'type', 'lineflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['mdpd']            = ('id', 'type', 'rho', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         
+        self.styles['molecular']       = ('id', 'molid', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['peri']            = ('id', 'type', 'volume', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['rheo']            = ('id', 'type', 'status', 'rho', 'x', 'y', 'z', 'ix', 'iy', 'iz')       
 
         self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['smd']             = ('id', 'type', 'molecule', 'volume', 'mass', 'kradius', 'cradius', 'x0', 'y0', 'z0', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['sph']             = ('id', 'type', 'rho', 'esph', 'cv', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         
         
         self.styles['_random']         = ('comment', 'element', 'name', 'vx', 'vy', 'vz')
@@ -89,13 +94,17 @@ class Styles:
                     'x':               0.0,
                     'y':               0.0,
                     'z':               0.0,
-                    'q':               0.0,
+                    'q':               0.0, 
+                    'x0':              0.0,
+                    'y0':              0.0,
+                    'z0':              0.0,
                     'vx':              0.0,
                     'vy':              0.0,
                     'vz':              0.0,
                     'ix':              0,
                     'iy':              0,
                     'iz':              0,
+                    'cv':              0.0,
                     'ed':              0.0,
                     'em':              0.0,
                     'mux':             0.0,
@@ -103,6 +112,7 @@ class Styles:
                     'muz':             0.0,
                     'rho':             0.0,
                     'type':            0,
+                    'esph':            0.0,
                     'area':            0.0,
                     'mass':            0.0,
                     'molid':           0,
@@ -110,10 +120,14 @@ class Styles:
                     'theta':           0.0,
                     'energy':          0.0,
                     'status':          0,
+                    'volume':          0.0,
                     'edpd_cv':         0.0,
                     'density':         0.0,
                     'epsilon':         0.0,
                     'eradius':         0.0,
+                    'kradius':         0.0,
+                    'cradius':         0.0,
+                    'molecule':        0,
                     'bodyflag':        0,
                     'lineflag':        0,
                     'diameter':        0.0,
@@ -134,12 +148,16 @@ class Styles:
                         'y':               float,
                         'z':               float,
                         'q':               float,
+                        'x0':              float,
+                        'y0':              float,
+                        'z0':              float,
                         'vx':              float,
                         'vy':              float,
                         'vz':              float,
                         'ix':              int,
                         'iy':              int,
                         'iz':              int,
+                        'cv':              float,
                         'ed':              float,
                         'em':              float,
                         'mux':             float,
@@ -147,6 +165,7 @@ class Styles:
                         'muz':             float,
                         'rho':             float,
                         'type':             _int_str,
+                        'esph':            float,
                         'area':            float,
                         'mass':            float,
                         'molid':           int,
@@ -154,10 +173,14 @@ class Styles:
                         'theta':           float,
                         'energy':          float,
                         'status':          int,
+                        'volume':          float,
                         'edpd_cv':         float,
                         'density':         float,
                         'epsilon':         float,
                         'eradius':         float,
+                        'kradius':         float,
+                        'cradius':         float,
+                        'molecule':        int,
                         'bodyflag':        int,
                         'lineflag':        int,
                         'diameter':        float,
