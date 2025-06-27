@@ -38,18 +38,15 @@ molecule.write_files('WRITE.data', atom_style='full')
 
 
 
+
 if __name__ == '__main__':
     import timeit
     
     file = 'EPON_862/detda_typed_IFF_merged.data'
     file = 'EPON_862/system1_cell_replicate.data'
     def call_mooonpy():
-        m = mooonpy.Molspace(filename=file, read='mooonpy', astyles=['all1', 'full'])
-        # i = 1
-        # print(m.atoms[i].comment, m.atoms[i].diameter)
-    
-    def call_lunar():
-        l = mooonpy.Molspace(filename=file, read='lunar', astyles=['full'])    
+        m = mooonpy.Molspace(filename=file, read='mooonpy', astyles=['all', 'full'])
+        m.write_files('WRITE.data', atom_style='full')
     
     # number = 1
     # print('\n\n')

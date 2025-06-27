@@ -28,6 +28,9 @@ def write(mol, filename, atom_style):
         header = mol.header
         f.write(f'{header[-220:len(header)]}\n') # Make max header length of 220 characters 
         
+        # lines = ['line:{}\n'.format(i) for i in range(10)]
+        # f.writelines(lines)
+        
         # Write structure quantities
         if mol.atoms: f.write(f'{len(mol.atoms)} atoms\n')
         if mol.bonds: f.write(f'{len(mol.bonds)} bonds\n')
@@ -178,8 +181,7 @@ def write(mol, filename, atom_style):
             if mol.atoms.style:
                 style_hint = '# {}'.format(mol.atoms.style)
             else: style_hint = ''
-            f.write('\nAtoms {}\n\n'.format(style_hint))  
-
+            f.write('\nAtoms # {}\n\n'.format(atom_style))  
             
             # Setup the atom line generation script
             hard_coded_atom_line_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('line_')}
@@ -205,54 +207,54 @@ def write(mol, filename, atom_style):
                 atom = mol.atoms[i]
                 f.write('{:^6} {:^16.10f} {:^16.10f} {:^16.10f}\n'.format(i, atom.vx, atom.vy, atom.vz))
                 
-            # Write bonds
-            if mol.bonds:
-                f.write('\nBonds\n\n')
-                for i, keys in enumerate(mol.bonds, 1):
-                    topo = mol.bonds[keys]
-                    
-                    if topo.comment:
-                        comment = '# {}'.format(topo.comment)
-                    else: comment = ''
-                    
-                    id1, id2 = topo.ordered
-                    f.write('{:^6} {:^3} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, comment))
-                    
-            # Write angles
-            if mol.angles:
-                f.write('\nAngles\n\n')
-                for i, keys in enumerate(mol.angles, 1):
-                    topo = mol.angles[keys]
-                    
-                    if topo.comment:
-                        comment = '# {}'.format(topo.comment)
-                    else: comment = ''
-                    
-                    id1, id2, id3 = topo.ordered
-                    f.write('{:^6} {:^3} {:^6} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, id3, comment))
-                    
-            # Write dihedrals
-            if mol.dihedrals:
-                f.write('\nDihedrals\n\n')
-                for i, keys in enumerate(mol.dihedrals, 1):
-                    topo = mol.dihedrals[keys]
-                    
-                    if topo.comment:
-                        comment = '# {}'.format(topo.comment)
-                    else: comment = ''
-                    
-                    id1, id2, id3, id4 = topo.ordered
-                    f.write('{:^6} {:^3} {:^6} {:^6} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, id3, id4, comment))
-                    
-            # Write impropers
-            if mol.impropers:
-                f.write('\nImpropers\n\n')
-                for i, keys in enumerate(mol.impropers, 1):
-                    topo = mol.impropers[keys]
-                    
-                    if topo.comment:
-                        comment = '# {}'.format(topo.comment)
-                    else: comment = ''
-                    
-                    id1, id2, id3, id4 = topo.ordered
-                    f.write('{:^6} {:^3} {:^6} {:^6} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, id3, id4, comment))
+        # Write bonds
+        if mol.bonds:
+            f.write('\nBonds\n\n')
+            for i, keys in enumerate(mol.bonds, 1):
+                topo = mol.bonds[keys]
+                
+                if topo.comment:
+                    comment = '# {}'.format(topo.comment)
+                else: comment = ''
+                
+                id1, id2 = topo.ordered
+                f.write('{:^6} {:^3} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, comment))
+                
+        # Write angles
+        if mol.angles:
+            f.write('\nAngles\n\n')
+            for i, keys in enumerate(mol.angles, 1):
+                topo = mol.angles[keys]
+                
+                if topo.comment:
+                    comment = '# {}'.format(topo.comment)
+                else: comment = ''
+                
+                id1, id2, id3 = topo.ordered
+                f.write('{:^6} {:^3} {:^6} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, id3, comment))
+                
+        # Write dihedrals
+        if mol.dihedrals:
+            f.write('\nDihedrals\n\n')
+            for i, keys in enumerate(mol.dihedrals, 1):
+                topo = mol.dihedrals[keys]
+                
+                if topo.comment:
+                    comment = '# {}'.format(topo.comment)
+                else: comment = ''
+                
+                id1, id2, id3, id4 = topo.ordered
+                f.write('{:^6} {:^3} {:^6} {:^6} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, id3, id4, comment))
+                
+        # Write impropers
+        if mol.impropers:
+            f.write('\nImpropers\n\n')
+            for i, keys in enumerate(mol.impropers, 1):
+                topo = mol.impropers[keys]
+                
+                if topo.comment:
+                    comment = '# {}'.format(topo.comment)
+                else: comment = ''
+                
+                id1, id2, id3, id4 = topo.ordered
+                f.write('{:^6} {:^3} {:^6} {:^6} {:^6} {:^6} {}\n'.format(i, topo.type, id1, id2, id3, id4, comment))

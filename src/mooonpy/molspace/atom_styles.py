@@ -54,10 +54,7 @@ class Styles:
         # LAMMPS 'full' atom style). *NOTE: to support any LAMMPS style that style key needs to be in self.read, self.styles,
         # and self.defaults dictionaries, even if "hard coded" readers and writers are generated - this is because this
         # will tell the code how to generate an instance of the Atom class, with necessary __slots__ and defaults.*
-        self.read = {}     # {'style' : (int or float or str)}     -> (int or float or str) sets how to read string
         self.styles = {}   # {'style' : (attr1, attr2, ...) }      -> (attr1, attr2, ...) sets attr name (e.g. 'id' 'x')
-        self.defaults = {} # {'style' : (default1, default2, ...)} -> (default1, default2, ...) sets default value for each attr
-        
         self.styles['angle']           = ('id', 'molid', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['atomic']          = ('id', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['body']            = ('id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z', 'ix', 'iy', 'iz')
@@ -263,14 +260,14 @@ class Styles:
         return line
     
     def line_full(self, atom, style):
-        pos = '{:^20.16f} {:^20.16f} {:^20.16f}'.format(atom.x, atom.y, atom.z)
+        pos = '{:^24.16f} {:^24.16f} {:^24.16f}'.format(atom.x, atom.y, atom.z)
         image = '{:^2} {:^2} {:^2}'.format(atom.ix, atom.iy, atom.iz)
         
         line = '{:^6} {:^4} {:^2} {:^20.16f} {} {}'.format(atom.id, atom.molid, atom.type, atom.q, pos, image)
         return line
     
     def line_charge(self, atom, style):
-        pos = '{:^20.16f} {:^20.16f} {:^20.16f}'.format(atom.x, atom.y, atom.z)
+        pos = '{:^24.16f} {:^24.16f} {:^24.16f}'.format(atom.x, atom.y, atom.z)
         image = '{:^2} {:^2} {:^2}'.format(atom.ix, atom.iy, atom.iz)
         
         line = '{:^6} {:^4} {:^20.16f} {} {}'.format(atom.id, atom.type, atom.q, pos, image)
