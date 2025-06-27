@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jun 23 11:33:04 2025
-
-@author: jdkem
-"""
 from ...tools import file_utils
 
 

@@ -56,41 +56,6 @@ if __name__ == '__main__':
     # mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
     # print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
     
-    # print('\n\n')
-    # lunar_time = timeit.timeit(stmt=call_lunar, number=number)
-    # print(f'lunar read time  : {lunar_time} seconds for {number} runs on 100,000 atom system')
-    
-    # def perf_percent(old, new):
-    #     return 100*(old-new)/new
-    
-    # def perf_xtimes(old, new):
-    #     return old/new
-    
-    # print('\n\n')
-    # print(f'Percent increase performance  : {perf_percent(lunar_time, mooonpy_time)} % | {perf_xtimes(lunar_time, mooonpy_time)} X')
-    
-    
-    # class A:
-    #     def __init__(self, **kwargs):
-    #         print(kwargs)
-    #         self.a = kwargs.pop('a', None)
-
-    # class B:
-    #     def __init__(self, **kwargs):
-    #         print(kwargs)
-    #         self.b = kwargs.pop('b', None)
-    
-    # class Combined:
-    #     def __init__(self, **kwargs):
-    #         self.a_obj = A(**kwargs)
-    #         self.b_obj = B(**kwargs)
-    #         self.c = kwargs.get('c', None)  # for Combined-specific args
-    #         print(kwargs)
-            
-    # obj = Combined(a=1, b=2, c=3)
-    # print(obj.a_obj.a)  # 1
-    # print(obj.b_obj.b)  # 2
-    # print(obj.c)        # 3
     
 
     

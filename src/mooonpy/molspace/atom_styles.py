@@ -2,7 +2,7 @@
 import re
 
 
-def is_float(string):
+def _is_float(string):
     float_re = re.compile(r'^-?\d+(\.\d+)?([eE][-+]?\d+)?$')
     return bool(float_re.match(string))
 
@@ -17,7 +17,7 @@ def _int_str(string):
 def _int_str_float(string):
     if string.isnumeric():
         return int(string)
-    elif is_float(string):
+    elif _is_float(string):
         return float(string)
     else:
         return string
