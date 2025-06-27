@@ -153,20 +153,19 @@ def write(mol, filename, atom_style):
                 print(__file__)
                 continue
             potential = getattr(mol.ff, attr)
-            if potential:
-                if potential.style:
-                    style_hint = '# {}'.format(potential.style)
-                else: style_hint = ''
-                f.write('\n{} {}\n\n'.format(potential.keyword, style_hint))
-                type_ids = sorted(potential.keys())
-                for i in type_ids: 
-                    coeff = potential[i]
-                    parms = coeff.coeffs
-                    if coeff.comment:
-                        comment = '# {}'.format(coeff.comment)
-                    else:
-                        comment = ''
-                    f.write('{:^3} {} {}\n'.format(i, string_parameters(parms), comment))
+            if not potential: continue
+            if potential.style:
+                style_hint = '# {}'.format(potential.style)
+            else: style_hint = ''
+            f.write('\n{} {}\n\n'.format(potential.keyword, style_hint))
+            type_ids = sorted(potential.keys())
+            for i in type_ids: 
+                coeff = potential[i]
+                parms = coeff.coeffs
+                if coeff.comment:
+                    comment = '# {}'.format(coeff.comment)
+                else: comment = ''
+                f.write('{:^3} {} {}\n'.format(i, string_parameters(parms), comment))
 
         # Write atoms and velocities
         if mol.atoms:
