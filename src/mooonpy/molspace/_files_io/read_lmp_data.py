@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from ...tools import file_utils
+from ...tools import string_utils
 
 
 
@@ -90,7 +91,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Bonds':
                 #nid = int(data_lst[0])
-                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 ordered = (id1, id2)
@@ -103,7 +104,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Angles':
                 #nid = int(data_lst[0])
-                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -117,7 +118,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Dihedrals':
                 #nid = int(data_lst[0])
-                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -132,7 +133,7 @@ def read(mol, filename, sections):
                 
             elif section == 'Impropers':
                 #nid = int(data_lst[0])
-                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -161,7 +162,7 @@ def read(mol, filename, sections):
             # ff_coeffs build - if not one will be initialized here)
             elif section in sections_coeffs and ff_coeffs is not None:
                 #print(n, line, section)
-                digits = [file_utils.string2digit(string) for string in data_lst]
+                digits = [string_utils.string2digit(string) for string in data_lst]
                 typeID = digits[0]
                 coeffs = digits[1:]
                 if typeID in ff_coeffs:
