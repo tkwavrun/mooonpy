@@ -91,7 +91,7 @@ class Styles:
         self.styles['tri']             = ('id', 'molid', 'type', 'triangleflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['wavepacket']      = ('id', 'type', 'q', 'espin', 'eradius', 'etag', 'cs_re', 'cs_im', 'x', 'y', 'z', 'ix', 'iy', 'iz')
 
-        self.styles['hybrid']          =  ('id', 'type', 'x', 'y', 'z', 'sub_styleN'), # WARNING 'sub_styleN', needs to be expaned to 'sub_style1', 'sub_style2', ... so 'hybrid' NOT TRULY SUPPORTED      
+        self.styles['hybrid']          =  ('id', 'type', 'x', 'y', 'z', 'sub_styleN') # WARNING 'sub_styleN', needs to be expaned to 'sub_style1', 'sub_style2', ... so 'hybrid' NOT TRULY SUPPORTED      
         self.styles['custom']          = ()     
         
         
