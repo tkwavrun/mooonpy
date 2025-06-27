@@ -20,6 +20,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   mooonpy.molspace.atom_styles
    mooonpy.molspace.atoms
    mooonpy.molspace.box
    mooonpy.molspace.doc_examples
@@ -29,4 +30,5 @@ Submodules
    mooonpy.molspace.lmp_styles
    mooonpy.molspace.mc
    mooonpy.molspace.molspace
+   mooonpy.molspace.periodic_table
    mooonpy.molspace.topology

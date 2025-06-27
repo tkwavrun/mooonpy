@@ -2,7 +2,7 @@
 import importlib
 
 __all__ = ['read_lmp_data',
-           'read_lmp'
+           'write_lmp_data'
 ]
 
 for name in __all__:

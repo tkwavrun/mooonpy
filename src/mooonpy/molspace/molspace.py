@@ -3,6 +3,7 @@ from . import _files_io as _files_io
 from .atoms import Atoms
 from .topology import Bonds, Angles, Dihedrals, Impropers
 from .force_field import ForceField
+from .._config import rcParams
 import os
 
 
@@ -52,8 +53,19 @@ class Molspace(object):
             matrix is ``2*N``, with `N` the number of biquad sections
             of the desired system.
         """
+        
+        print(rcParams)
+        
+        # Get some basic config options from kwargs or setup defaults
+        #print(kwargs)
+        
+        self.astyles = kwargs.pop('astyles', ['all', 'full']) # ['read-atom-style', 'write-atom-style'] or ['read-atom-style']
+        self.dsect = kwargs.pop('dsect', ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']) # 
+        
+        #print(kwargs)
+        
         # Build this object with some composition
-        self.atoms: Atoms = Atoms()
+        self.atoms: Atoms = Atoms(self.astyles)
         self.bonds: Bonds = Bonds()
         self.angles: Angles = Angles()
         self.dihedrals: Dihedrals = Dihedrals()
@@ -64,23 +76,33 @@ class Molspace(object):
         self.filename = filename
         self.header = ''
         if filename:
-            if os.path.exists(filename):
-                self.read_files(filename, kwargs)
-            else:
+            if not self.filename:
+                pass
+            
+            if not os.path.exists(filename):
                 raise FileNotFoundError(f'{filename} was not found or is a directory')
+            
+            self.read_files(filename, dsect=self.dsect) 
+            
+    
+        #keys = self.bonds
+
+                
         
 
         
-    def read_files(self, filename, kwargs):
-        root, ext = os.path.splitext(filename)
-        defaults = {'read':'mooonpy', 'sections':('Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities')}
-        config = {**defaults, **kwargs}
+    def read_files(self, filename, dsect=['all']):
+        root, ext = os.path.splitext(filename)     
         if filename.endswith('.data'):
-            if config['read'] == 'mooonpy':
-                _files_io.read_lmp_data.read(self, filename, config)
-            else:
-                m = _files_io.read_lmp.Molecule_File(filename, method='forward', sections=defaults['sections'])
+            if 'all' in dsect:
+                dsect = ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']
+            _files_io.read_lmp_data.read(self, filename, dsect)
             
         return None
+    
+    def write_files(self, filename, atom_style='full'):
+        root, ext = os.path.splitext(filename)     
+        if filename.endswith('.data'):
+            _files_io.write_lmp_data.write(self, filename, atom_style)
         
         

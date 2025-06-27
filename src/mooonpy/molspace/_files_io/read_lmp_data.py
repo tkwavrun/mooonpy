@@ -1,16 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jun 23 11:33:04 2025
-
-@author: jdkem
-"""
 from ...tools import file_utils
-import time
-import timeit
 
 
 
-def read(mol, filename, config):
+def read(mol, filename, sections):
     
     # Define sections to read (using inputs from user if they pass them)
     sections_mp:    list[str] = ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities', 'Ellipsoids', 'Lines', 'Triangles', 'Bodies']
@@ -23,63 +16,21 @@ def read(mol, filename, config):
     # Setup the sets that will be used for parsing
     sections_all:    set[str] = set(sections_mp + sections_tl + sections_ff + sections_xt + sections_fixes)
     sections_coeffs: set[str] = sections_ff + sections_xt
-    sections_kwargs: set[str] = set(config['sections'])
+    sections_kwargs: set[str] = set(sections)
     
     
-    # Find "hard coded" atom style reads for performance
-    hard_coded_atom_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('atoms_')}
+    # Create shortcuts to all the generation factories for speed and ease of use
+    atom_factory = mol.atoms.styles.atom_factory
+    bond_factory = mol.bonds.bond_factory
+    angle_factory = mol.angles.angle_factory
+    dihedral_factory = mol.dihedrals.dihedral_factory
+    improper_factory = mol.impropers.improper_factory
+    coeffs_factory = mol.ff.coeffs_factory
     
-    
-        # self.lammps = {'full':         ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
-        #                'charge':       ('id', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
-        #                'body':         ('id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z', 'ix', 'iy', 'iz'),
-        #                'custom':       ()}
         
-        # self.other = {'xyz':          ('element', 'x', 'y', 'z'),
-        #               'mol2':         ('ID', 'element', 'x', 'y', 'z', 'element', 'molid', 'name', 'q')}
-    
-    
-    # Per-atom and per-bond, angle, ... can be generated with each instance as:
-    #  - mol.atoms.styles.gen_atom()
-    #  - mol.bonds.gen_bond()
-    #  - mol.angles.gen_bond()
-    #  - mol.dihedrals.gen_bond()
-    #  - mol.impropers.gen_bond()
-    # but is slow due to class structure. Using these "pre-built local" versions
-    # of *.gen_*() significantly improves performance.
-    class Atom:
-        __slots__ = mol.atoms.styles.all_per_atom
-        def __init__(self):
-            self.q: float = 0.0
-            # self.x: float = 0.0
-            # self.y: float = 0.0
-            # self.z: float = 0.0            
-            # self.vx: float = 0.0
-            # self.vy: float = 0.0
-            # self.vz: float = 0.0
-            # self.mass: float = 0.0
-            # #self.ccN: float = 0.0
-            # #self.cradius: float = 0.0
-            
-            # self.ix: int = 0
-            # self.iy: int = 0
-            # self.iz: int = 0
-            # self.type: int = 0
-            # self.molid: int = 0
-            # self.bodyflag: int = 0
-            
-            # self.comment: str = ''
-            # self.element: str = ''
-            
-    class Nbody():  
-        __slots__ = ('bo', 'type', 'ordered', 'comment')
-        def __init__(self):
-            self.bo: float = 0.0
-            self.type: int = 0
-            self.ordered: list[int] = []
-            self.comment: str = ''
-    
-    atom_factory = mol.atoms.gen_atom
+    # Find "hard coded" atom style reads for performance and set atom_reader to slow and update later on
+    hard_coded_atom_reading_styles = {i.split('_')[-1]:i for i in dir(mol.atoms.styles) if i.startswith('read_')}
+    atom_reader = mol.atoms.styles.atom_fill
     
     
     # Open and read contents from file
@@ -87,182 +38,112 @@ def read(mol, filename, config):
     section: str = ''
     ff_coeffs: None = None # Will be a pointer to specifc ff_coeffs to update
     with file_utils.smart_open(filename) as f:
-        #f = f.readlines()
+        f = f.readlines()
         for n, string in enumerate(f):
-            skip -= 1
-            string = string.strip()
-            
             # skip line between section keywords and "top of the body"
-            if skip >= 0:
+            if skip > 0:
+                skip -= 1
                 continue
             
             # Toggle section "off" since a blank line will be at 
             # the "bottom of the body" (skip handles the blank line
             # at the "top of the body").
-            elif not string:
+            elif string == '\n' or not string:
                 section = ''
                 continue
             
             # Deal with comments
             elif '#' in string:
-                line = string.split('#')
+                line = string.partition('#')
                 data_str = line[0].strip()
                 data_lst = data_str.split()
-                comment = line[1].strip()
+                comment = line[2].strip()
             else:
                 data_str = string.strip()
                 data_lst = data_str.split()
                 comment = ''
 
-            
+
             #-------------------------------------------------------#
-            # Parse the computationally heavy parts 1st:            #
-            #  - setting the section requires looking at each line  #
-            #  - if we already know the section we can get extra    #
-            #    performance by not having to set section flag for  #
-            #    the entire strech of the large sections            #
+            # Parse the computationally heavy parts 1st:
+            #  - setting the section requires looking at each line
+            #  - if we already know the section we can get extra
+            #    performance by not having to set section flag for
+            #    the entire stretch of the large sections
             #-------------------------------------------------------#
             if section == 'Atoms':
-                # if mol.atoms.style in hard_coded_atom_styles:
-                #     atom = getattr(mol.atoms.styles, hard_coded_atom_styles[mol.atoms.style])(data_lst)
-                # else:
-                #     atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
-                # #atom = mol.atoms.gen_atom(mol.atoms.style, data_lst)
-                # atom.comment = comment
-                # mol.atoms[atom.id] = atom
-                
-                # print()
-                # print(n)
-                
-                # def gen():
-                #     atom = Atom() 
-                #     #atom = mol.atoms.styles.gen_atom()
-                #     #atom = type('Atom', (), {'__slots__': ('id', 'molid', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz')})
-                
-                # def parse():
-                #     id = int(data_lst[0])
-                #     molid = int(data_lst[1])
-                #     type = int(data_lst[2])
-                #     q = float(data_lst[3])
-                #     x = float(data_lst[4])
-                #     y = float(data_lst[5])
-                #     z = float(data_lst[6])
-                #     try:
-                #         ix = int(data_lst[7])
-                #         iy = int(data_lst[8])
-                #         iz = int(data_lst[9])
-                #     except:
-                #         ix = 0
-                #         iy = 0
-                #         iz = 0
-                    
-                # number = 100_000
-                # gen_time = timeit.timeit(stmt=gen, number=number)
-                # parse_time = timeit.timeit(stmt=parse, number=number)
-                # print('gen time: ', gen_time)
-                # print('parse time: ', parse_time)
-                
-                
-                # atom = mol.atoms.gen_atom()
-                # if mol.atoms.style == 'full':
-                #     atom.id = int(data_lst[0])
-                #     atom.molid = int(data_lst[1])
-                #     atom.type = int(data_lst[2])
-                #     atom.q = float(data_lst[3])
-                #     atom.x = float(data_lst[4])
-                #     atom.y = float(data_lst[5])
-                #     atom.z = float(data_lst[6])
-                #     try:
-                #         atom.ix = int(data_lst[7])
-                #         atom.iy = int(data_lst[8])
-                #         atom.iz = int(data_lst[9])
-                #     except:
-                #         atom.ix = 0
-                #         atom.iy = 0
-                #         atom.iz = 0
-                #     atom.comment = comment
-                #     mol.atoms[atom.id] = atom
-                # else:
-                #     atom = mol.atoms.fill_atom(atom, mol.atoms.style, data_lst)
-                #     atom.comment = comment
-                #     mol.atoms[atom.id] = atom
-                
-                
-                
-                #atom = mol.atoms.gen_atom()
-                atom = Atom() 
-                #atom = atom_factory()
-                atom.id = int(data_lst[0])
-                atom.molid = int(data_lst[1])
-                atom.type = int(data_lst[2])
-                atom.q = float(data_lst[3])
-                atom.x = float(data_lst[4])
-                atom.y = float(data_lst[5])
-                atom.z = float(data_lst[6])
-                try:
-                    atom.ix = int(data_lst[7])
-                    atom.iy = int(data_lst[8])
-                    atom.iz = int(data_lst[9])
-                except:
-                    atom.ix = 0
-                    atom.iy = 0
-                    atom.iz = 0
+                atom = atom_factory()
+                atom = atom_reader(atom, mol.atoms.style, data_lst)
                 atom.comment = comment
                 mol.atoms[atom.id] = atom
-                pass
+                
+            elif section == 'Velocities':
+                nid = int(data_lst[0])
+                vx = float(data_lst[1])
+                vy = float(data_lst[2])
+                vz = float(data_lst[3])
+                
+                atom = mol.atoms[nid]
+                atom.vx = vx
+                atom.vy = vy
+                atom.vz = vz
                 
             elif section == 'Bonds':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
+                ordered = (id1, id2)
                 
-                bond = Nbody() #mol.bonds.gen_bond()
-                bond.ordered = [id1, id2]
+                bond = bond_factory()
+                bond.ordered = list(ordered) #[id1, id2]
                 bond.comment = comment
-                bond.type = typeID
-                mol.bonds[(id1, id2)] = bond
+                bond.type = type_id
+                mol.bonds[ordered] = bond
                 
             elif section == 'Angles':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
+                ordered = (id1, id2, id3)
                 
-                angle = Nbody() #mol.angles.gen_angle()
-                angle.ordered = [id1, id2, id3]
+                angle = angle_factory()
+                angle.ordered = list(ordered) #[id1, id2, id3]
                 angle.comment = comment
-                angle.type = typeID
-                mol.angles[(id1, id2, id3)] = angle
+                angle.type = type_id
+                mol.angles[ordered] = angle
                 
             elif section == 'Dihedrals':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
                 id4 = int(data_lst[5])
+                ordered = (id1, id2, id3, id4)
                 
-                dihedral = Nbody() #mol.dihedrals.gen_dihedral()
-                dihedral.ordered = [id1, id2, id3, id4]
+                dihedral = dihedral_factory()
+                dihedral.ordered = list(ordered) #[id1, id2, id3, id4]
                 dihedral.comment = comment
-                dihedral.type = typeID
-                mol.dihedrals[(id1, id2, id3, id4)] = dihedral
+                dihedral.type = type_id
+                mol.dihedrals[ordered] = dihedral
                 
             elif section == 'Impropers':
-                #ID = int(data_lst[0])
-                typeID = file_utils.string2digit(data_lst[1]) # This  could be a type label
+                #nid = int(data_lst[0])
+                type_id = file_utils.string2digit(data_lst[1]) # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
                 id4 = int(data_lst[5])
+                ordered = (id1, id2, id3, id4)
                 
-                improper = Nbody() #mol.impropers.gen_improper()
-                improper.ordered = [id1, id2, id3, id4]
+                improper = improper_factory() 
+                improper.ordered = list(ordered) #[id1, id2, id3, id4]
                 improper.comment = comment
-                improper.type = typeID
-                mol.impropers[(id1, id2, id3, id4)] = improper
+                improper.type = type_id
+                mol.impropers[ordered] = improper
             
             
             # Type labels can initialize a ff_coeffs build
@@ -270,7 +151,7 @@ def read(mol, filename, config):
                 typeID = int(data_lst[0])
                 type_label = str(data_lst[1])
                 
-                params = ff_coeffs.gen_params()
+                params = coeffs_factory()
                 params.comment = type_label
                 params.type_label = type_label
                 ff_coeffs[typeID] = params
@@ -289,12 +170,12 @@ def read(mol, filename, config):
                     # Build type label from comment, if type label
                     # doesnt already exist or set as read-in typeID
                     if comment:
-                        type_label = comment
+                        type_label = '-'.join( comment.split() )
                     else:
-                        type_label = str(typeID)
+                        type_label = 'tl|{}'.format(str(typeID))
                         
                     # Generate a params instance and add to it 
-                    params = ff_coeffs.gen_params(coeffs)
+                    params = coeffs_factory(coeffs)
                     params.comment = comment
                     params.type_label = type_label
                     ff_coeffs[typeID] = params  
@@ -303,26 +184,32 @@ def read(mol, filename, config):
             elif 'xlo' in data_str and 'xhi' in data_str:
                 mol.atoms.box.xlo = float(data_lst[0]) 
                 mol.atoms.box.xhi = float(data_lst[1]) 
+                continue
             elif 'ylo' in data_str and 'yhi' in data_str:
                 mol.atoms.box.ylo = float(data_lst[0]) 
                 mol.atoms.box.yhi = float(data_lst[1]) 
+                continue
             elif 'zlo' in data_str and 'zhi' in data_str:
                 mol.atoms.box.zlo = float(data_lst[0]) 
                 mol.atoms.box.zhi = float(data_lst[1]) 
+                continue
             elif 'xy' in data_str and 'xz' in data_str and 'yz' in data_str:
                 mol.atoms.box.xy = float(data_lst[0]) 
                 mol.atoms.box.xz = float(data_lst[1]) 
-                mol.atoms.box.yz = float(data_lst[2])               
-            elif n == 0: mol.header = string
+                mol.atoms.box.yz = float(data_lst[2]) 
+                continue
+            elif n == 0: 
+                mol.header = string
+                continue
 
                 
             #-----------------------------------------------------------------#
-            # Toggle between sections. Toggling is expensive:                 #
-            #  - Requires each line to be check, which means every line in    #
-            #    Atoms, Bond, ... etc needs to be checked                     #
-            #  - If we use wise if/elif settings, once the Atoms, Bonds, ...  #
-            #    etc sections have been found we do not have to check         #
-            #    if data_str is a section to parse                            #
+            # Toggle between sections. Toggling is expensive:                 
+            #  - Requires each line to be check, which means every line in    
+            #    Atoms, Bond, ... etc needs to be checked                     
+            #  - If we use wise if/elif settings, once the Atoms, Bonds, ...  
+            #    etc sections have been found we do not have to check         
+            #    if data_str is a section to parse                            
             #-----------------------------------------------------------------#
             #elif data_str in sections_all:
             elif data_str[0].isalpha():
@@ -335,8 +222,13 @@ def read(mol, filename, config):
                 # that section read or not (if not set section to '', to skip reading that section)
                 if section == 'Atoms':
                     mol.atoms.style = comment
-                    if 'Atoms' not in sections_kwargs:
-                        section = ''
+                    if 'Atoms' not in sections_kwargs: section = ''
+                    
+                    # Update atom reader to a quicker one (if supported)
+                    if mol.atoms.style in hard_coded_atom_reading_styles:
+                        reader_name = hard_coded_atom_reading_styles[mol.atoms.style]
+                        atom_reader = getattr(mol.atoms.styles, reader_name)
+
                 elif section == 'Bonds' and 'Bonds' not in sections_kwargs:
                     section = ''
                 elif section == 'Angles' and 'Angles' not in sections_kwargs:
@@ -353,14 +245,19 @@ def read(mol, filename, config):
                 # are ready, the coeffs will be updated at that point).
                 elif section == 'Atom Type Labels':
                     ff_coeffs = mol.ff.masses
+                    mol.ff.has_type_labels = True
                 elif section == 'Bond Type Labels':
                     ff_coeffs = mol.ff.bond_coeffs
+                    mol.ff.has_type_labels = True
                 elif section == 'Angle Type Labels':
                     ff_coeffs = mol.ff.angle_coeffs
+                    mol.ff.has_type_labels = True
                 elif section == 'Dihedral Type Labels':
                     ff_coeffs = mol.ff.dihedral_coeffs
+                    mol.ff.has_type_labels = True
                 elif section == 'Improper Type Labels':
                     ff_coeffs = mol.ff.improper_coeffs
+                    mol.ff.has_type_labels = True
                 
                 # Force field related parsing
                 elif section == 'Masses':
@@ -409,81 +306,67 @@ def read(mol, filename, config):
                     # We need to toggle ff_coeffs between different sections
                     # so we do not add coeffs to the wrong dictionaries
                     ff_coeffs = None
-                continue
             
 
-
-
+    print_info = False
+    #print_info = True
+    if print_info:
+        print('\n\n\nSTYLES:')
+        print('header: ', mol.header[:50])
+        print('atom style: ', mol.atoms.style)
+        print('xbox: ', mol.atoms.box.xlo, mol.atoms.box.xhi)
+        print('ybox: ', mol.atoms.box.ylo, mol.atoms.box.yhi)
+        print('zbox: ', mol.atoms.box.zlo, mol.atoms.box.zhi)
+        print('tilt: ', mol.atoms.box.xy, mol.atoms.box.xz, mol.atoms.box.yz)
+        print('natoms: ', len(mol.atoms))
+        print('nbonds: ', len(mol.bonds))
+        print('nangles: ', len(mol.angles))
+        print('ndihedrals: ', len(mol.dihedrals))
+        print('nimpropers: ', len(mol.impropers))
+        
+        print('\n\nAtoms')
+        for n, (key, value) in enumerate(mol.atoms.items()):
+            if n < 5:
+                print(key, value.type, value.x, value.y, value.z, value.comment, value.element, id(value))
+        
+        print('\n\nLINE GEN')
+        line = mol.atoms.styles.atom_line(mol.atoms[1], style='full')
+        print(line)
+        
+        print('\n\nBonds')
+        for n, (key, value) in enumerate(mol.bonds.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.bo, value.comment, id(value))
                 
-
+        print('\n\nAngles')
+        for n, (key, value) in enumerate(mol.angles.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.comment, id(value))
                 
-            
-
-            
-
-    
-    # print('\n\n\nSTYLES:')
-    # print('header: ', mol.header[:50])
-    # print('atom style: ', mol.atoms.style)
-    # print('xbox: ', mol.atoms.box.xlo, mol.atoms.box.xhi)
-    # print('ybox: ', mol.atoms.box.ylo, mol.atoms.box.yhi)
-    # print('zbox: ', mol.atoms.box.zlo, mol.atoms.box.zhi)
-    # print('tilt: ', mol.atoms.box.xy, mol.atoms.box.xz, mol.atoms.box.yz)
-    # print('natoms: ', len(mol.atoms))
-    # print('nbonds: ', len(mol.bonds))
-    # print('nangles: ', len(mol.angles))
-    # print('ndihedrals: ', len(mol.dihedrals))
-    # print('nimpropers: ', len(mol.impropers))
-    
-    # print('\n\nAtoms')
-    # for n, (key, value) in enumerate(mol.atoms.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.x, value.y, value.z, value.comment)
-    # # line = mol.atoms.styles.gen_line(mol.atoms[1], style='body')
-    # # print(line)
-    
-    # print('\n\nBonds')
-    # for n, (key, value) in enumerate(mol.bonds.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-            
-    # print('\n\nAngles')
-    # for n, (key, value) in enumerate(mol.angles.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-            
-    # print('\n\nDihedrals')
-    # for n, (key, value) in enumerate(mol.dihedrals.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-            
-    # print('\n\nImpropers')
-    # for n, (key, value) in enumerate(mol.impropers.items()):
-    #     if n < 5:
-    #         print(key, value.type, value.ordered, value.bo, value.comment)
-    
-    # d = mol.ff.masses
-    # # d = mol.ff.pair_coeffs
-    # # d = mol.ff.bond_coeffs
-    # # d = mol.ff.angle_coeffs
-    # # d = mol.ff.dihedral_coeffs
-    # # d = mol.ff.improper_coeffs
-    # # d = mol.ff.bondbond_coeffs
-    # # d = mol.ff.bondangle_coeffs
-    # # d = mol.ff.angleangletorsion_coeffs
-    # # d = mol.ff.endbondtorsion_coeffs
-    # # d = mol.ff.middlebondtorsion_coeffs
-    # # d = mol.ff.bondbond13_coeffs
-    # # d = mol.ff.angletorsion_coeffs
-    # # d = mol.ff.angleangle_coeffs
-    # print('\n\nFF-CHECK: ', d.style)
-    # for key, value in d.items():
-    #     print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
+        print('\n\nDihedrals')
+        for n, (key, value) in enumerate(mol.dihedrals.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.comment, id(value))
+                
+        print('\n\nImpropers')
+        for n, (key, value) in enumerate(mol.impropers.items()):
+            if n < 5:
+                print(key, value.type, value.ordered, value.comment, id(value))
         
-
-            
-
-        
-
-            
-        
+        d = mol.ff.masses
+        # d = mol.ff.pair_coeffs
+        # d = mol.ff.bond_coeffs
+        # d = mol.ff.angle_coeffs
+        # d = mol.ff.dihedral_coeffs
+        # d = mol.ff.improper_coeffs
+        # d = mol.ff.bondbond_coeffs
+        # d = mol.ff.bondangle_coeffs
+        # d = mol.ff.angleangletorsion_coeffs
+        # d = mol.ff.endbondtorsion_coeffs
+        # d = mol.ff.middlebondtorsion_coeffs
+        # d = mol.ff.bondbond13_coeffs
+        # d = mol.ff.angletorsion_coeffs
+        # d = mol.ff.angleangle_coeffs
+        print('\n\nFF-CHECK: ', d.style)
+        for key, value in d.items():
+            print('{} {}   "{}"   "{}"'.format(key, value.coeffs, value.type_label, value.comment))
