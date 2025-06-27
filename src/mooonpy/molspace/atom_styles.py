@@ -59,12 +59,26 @@ class Styles:
         self.styles['atomic']          = ('id', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['body']            = ('id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         
+        self.styles['bond']            = ('id', 'molid', 'type', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['bpm/sphere']      = ('id', 'molid', 'type', 'diameter', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
-        self.styles['dielectric']      = ('id', 'type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz', 'area', 'ed', 'em', 'epsilon', 'curvature', 'ix', 'iy', 'iz')
-        
-        self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy', 'x', 'y', 'z', 'ix', 'iy', 'iz')
-        self.styles['full']            = ('id', 'molid', 'type', 'q',  'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['charge']          = ('id', 'type', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        
+        self.styles['dielectric']      = ('id', 'type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz', 'area', 'ed', 'em', 'epsilon', 'curvature', 'ix', 'iy', 'iz')
+        self.styles['dipole']          = ('id', 'type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz', 'ix', 'iy', 'iz')
+        self.styles['dpd']             = ('id', 'type', 'theta', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        
+        self.styles['edpd']            = ('id', 'type', 'edpd_temp', 'edpd_cv', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['electron']        = ('id', 'type',  'espin',  'eradius', 'q', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['ellipsoid']       = ('id', 'type',  'ellipsoidflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        
+        self.styles['full']            = ('id', 'molid', 'type', 'q',  'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['line']            = ('id', 'molid', 'type', 'lineflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['mdpd']            = ('id', 'type', 'rho', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        
+
+        self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        
+        
         self.styles['_random']         = ('comment', 'element', 'name', 'vx', 'vy', 'vz')
         self.styles['custom']          = ()
         #self.styles['_chemistry']      = ('hybrid', 'element', 'rings') # attributte groupings
@@ -92,13 +106,20 @@ class Styles:
                     'area':            0.0,
                     'mass':            0.0,
                     'molid':           0,
+                    'espin':           0,
+                    'theta':           0.0,
                     'energy':          0.0,
                     'status':          0,
+                    'edpd_cv':         0.0,
                     'density':         0.0,
                     'epsilon':         0.0,
+                    'eradius':         0.0,
                     'bodyflag':        0,
+                    'lineflag':        0,
                     'diameter':        0.0,
                     'curvature':       0.0,
+                    'edpd_temp':       0.0,
+                    'ellipsoidflag':   0,
                     'template_index':  0,
                     'comment':         '',
                     'element':         '',
@@ -129,13 +150,20 @@ class Styles:
                         'area':            float,
                         'mass':            float,
                         'molid':           int,
+                        'espin':           int,
+                        'theta':           float,
                         'energy':          float,
                         'status':          int,
+                        'edpd_cv':         float,
                         'density':         float,
                         'epsilon':         float,
+                        'eradius':         float,
                         'bodyflag':        int,
+                        'lineflag':        int,
                         'diameter':        float,
                         'curvature':       float,
+                        'edpd_temp':       float,
+                        'ellipsoidflag':   int,
                         'template_index':  int,
                         'comment':         str,
                         'element':         str,
