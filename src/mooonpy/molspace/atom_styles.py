@@ -82,11 +82,21 @@ class Styles:
         self.styles['rheo/thermal']    = ('id', 'type',  'status', 'rho', 'energy', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['smd']             = ('id', 'type', 'molecule', 'volume', 'mass', 'kradius', 'cradius', 'x0', 'y0', 'z0', 'x', 'y', 'z', 'ix', 'iy', 'iz')
         self.styles['sph']             = ('id', 'type', 'rho', 'esph', 'cv', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+
+        self.styles['sphere']          = ('id', 'type', 'diameter', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['spin']            = ('id', 'type', 'x', 'y', 'z', 'spx', 'spy', 'spz', 'sp', 'ix', 'iy', 'iz')   
+        self.styles['tdpd']            = ('id', 'type', 'x', 'y', 'z', 'ccN') # WARNING 'ccN', needs to be expaned to 'cc1', 'cc2', ... so 'tdpd' NOT TRULY SUPPORTED
+
+        self.styles['template']        = ('id', 'type', 'molid', 'template_index', 'template_atom', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['tri']             = ('id', 'molid', 'type', 'triangleflag', 'density', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+        self.styles['wavepacket']      = ('id', 'type', 'q', 'espin', 'eradius', 'etag', 'cs_re', 'cs_im', 'x', 'y', 'z', 'ix', 'iy', 'iz')
+
+        self.styles['hybrid']          =  ('id', 'type', 'x', 'y', 'z', 'sub_styleN'), # WARNING 'sub_styleN', needs to be expaned to 'sub_style1', 'sub_style2', ... so 'hybrid' NOT TRULY SUPPORTED      
+        self.styles['custom']          = ()     
         
         
         self.styles['_random']         = ('comment', 'element', 'name', 'vx', 'vy', 'vz')
-        self.styles['custom']          = ()
-        #self.styles['_chemistry']      = ('hybrid', 'element', 'rings') # attributte groupings
+        #self.styles['_chemistry']     = ('hybrid', 'element', 'rings') # attribute groupings
         
 
         # Setup the default values per each attribute
@@ -107,14 +117,22 @@ class Styles:
                     'cv':              0.0,
                     'ed':              0.0,
                     'em':              0.0,
+                    'sp':              0.0,
+                    'spx':             0.0,
+                    'spy':             0.0,
+                    'spz':             0.0,
                     'mux':             0.0,
                     'muy':             0.0,
                     'muz':             0.0,
                     'rho':             0.0,
+                    'ccN':             0.0,
                     'type':            0,
+                    'etag':            0,
                     'esph':            0.0,
                     'area':            0.0,
                     'mass':            0.0,
+                    'cs_re':           0.0,
+                    'cs_im':           0.0,
                     'molid':           0,
                     'espin':           0,
                     'theta':           0.0,
@@ -133,12 +151,14 @@ class Styles:
                     'diameter':        0.0,
                     'curvature':       0.0,
                     'edpd_temp':       0.0,
+                    'triangleflag':    0,
                     'ellipsoidflag':   0,
+                    'template_atom':   0,
                     'template_index':  0,
+                    'sub_styleN':      0.0,
                     'comment':         '',
                     'element':         '',
                     'name':            '',
-                    
                     }
         
         # Set the function aliases on how to convert a string from a file
@@ -160,14 +180,22 @@ class Styles:
                         'cv':              float,
                         'ed':              float,
                         'em':              float,
+                        'sp':              float,
+                        'spx':             float,
+                        'spy':             float,
+                        'spz':             float,
                         'mux':             float,
                         'muy':             float,
                         'muz':             float,
                         'rho':             float,
+                        'ccN':             float,
                         'type':             _int_str,
+                        'etag':            int,
                         'esph':            float,
                         'area':            float,
                         'mass':            float,
+                        'cs_re':           float,
+                        'cs_im':           float,
                         'molid':           int,
                         'espin':           int,
                         'theta':           float,
@@ -186,8 +214,11 @@ class Styles:
                         'diameter':        float,
                         'curvature':       float,
                         'edpd_temp':       float,
+                        'triangleflag':    int,
                         'ellipsoidflag':   int,
+                        'template_atom':   int,
                         'template_index':  int,
+                        'sub_styleN':      _int_str_float, 
                         'comment':         str,
                         'element':         str,
                         'name':            str,
