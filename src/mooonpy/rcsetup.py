@@ -33,11 +33,13 @@ class RCParams(MutableMapping):
         return str(self._params)
 
 # Default parameters
-_defaults = {'color': 'blue',
-             'linewidth': 2,     
-             'fontsize': 12,
-             'molspace.read.dsect': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'],
-             'molspace.astyles': ['all']
+_defaults = {'molspace.read.dsect': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities'],
+             'molspace.write.data.astyle': 'full',
+             'molspace.astyles': ['all'],
+             
+             'thermospace.read': 'all',
+             
+             'xrdspace.read': 'all'
 }
 
 rcParams = RCParams(_defaults)
