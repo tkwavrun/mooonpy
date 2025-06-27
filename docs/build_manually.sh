@@ -1,6 +1,24 @@
+#!/bin/bash
+#
 # This bash script is meant to manually build the html docs for quick
 # testing and deployment, before letting the GitHub actions build and
-# publish the online versions.
+# publish the online versions.#
+#
+# SCRIPT/PYTHON SETUP:
+#   This script requires the packages found in .requirements.txt. To add them 
+#   to your Python enviroment run this in the /docs directory:
+#     Windows PowerShell:
+#       python -m pip install -r requirements.txt
+#     Linux commandline
+#       pip install -r requirements.txt
+#
+# SCRIPT/BASH RUN:
+#     Windows PowerShell (EXPEIRMENTAL):
+#     ./build_manually.sh
+#
+#   Linux commandline:
+#     bash build_manually.sh
+
 
 # Remove old *.rst files except for:
 # * index.rst
