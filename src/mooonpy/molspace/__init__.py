@@ -10,6 +10,7 @@ __all__ = ['atoms',
            'lmp_styles',
            'mc',
            'molspace',
+           'force_field'
 ]
 
 for name in __all__:
