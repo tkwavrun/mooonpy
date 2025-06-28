@@ -6,8 +6,6 @@ __all__ = ['atoms',
            'doc_examples',
            'graph_theory',
            'hw',
-           'hw_2',
-           'lmp_styles',
            'mc',
            'molspace',
            'force_field'
