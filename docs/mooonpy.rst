@@ -18,3 +18,11 @@ Subpackages
    mooonpy.thermospace
    mooonpy.tools
    mooonpy.xrdspace
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mooonpy.rcsetup

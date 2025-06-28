@@ -26,8 +26,6 @@ Submodules
    mooonpy.molspace.doc_examples
    mooonpy.molspace.force_field
    mooonpy.molspace.hw
-   mooonpy.molspace.hw_2
-   mooonpy.molspace.lmp_styles
    mooonpy.molspace.mc
    mooonpy.molspace.molspace
    mooonpy.molspace.periodic_table

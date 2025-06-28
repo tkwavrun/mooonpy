@@ -13,3 +13,4 @@ Submodules
    :maxdepth: 4
 
    mooonpy.thermospace.plotting
+   mooonpy.thermospace.thermospace

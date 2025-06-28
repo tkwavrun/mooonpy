@@ -16,3 +16,4 @@ Submodules
    mooonpy.tools.hw
    mooonpy.tools.math_utils
    mooonpy.tools.string_utils
+   mooonpy.tools.tables
