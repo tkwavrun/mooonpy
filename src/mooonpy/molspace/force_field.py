@@ -44,10 +44,10 @@ class ForceField(object):
         return Parameters(coeffs)
     
     def get_per_line_styles(self, coeff):
-        
+        lines = {} # {'TypeID':'per-line-style'}
         potential = getattr(self, coeff)
         for i in potential:
-            print(i, potential[i].style)
-        return
+            lines[i] = potential[i].style
+        return lines
 
         

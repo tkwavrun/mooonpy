@@ -30,9 +30,9 @@ def write(mol, filename):
             
         # Write all sections that have the "Coeffs ending"
         potentials = [i for i in dir(mol.ff) if i.endswith('coeffs')]
-        write_order = ['pair_coeffs', 'bond_coeffs', 'angle_coeffs', 'dihedral_coeffs', 'improper_coeffs', 
-                       'bondbond_coeffs', 'bondangle_coeffs', 'angleangletorsion_coeffs', 'endbondtorsion_coeffs',
-                       'middlebondtorsion_coeffs', 'bondbond13_coeffs', 'angletorsion_coeffs', 'angleangle_coeffs']
+        write_order = ['angleangletorsion_coeffs', 'endbondtorsion_coeffs',
+                       'middlebondtorsion_coeffs', 'bondbond13_coeffs', 
+                       'angletorsion_coeffs', 'angleangle_coeffs']
         
         
         write_order = {'pair_coeffs':'pair_coeff',
@@ -63,13 +63,11 @@ def write(mol, filename):
                 print(__file__)
                 continue
             
-            potential = getattr(mol.ff, attr)            
-            type_ids = sorted(potential.keys())
-            lmp_name = write_order[attr]
-            for i in type_ids: 
-                coeff = potential[i] 
-                if attr in styles:
-                    styles[attr]['per-line'].add(coeff.style)
+            if attr not in styles: continue
+            potential = getattr(mol.ff, attr)     
+            lines = mol.ff.get_per_line_styles(attr)
+            pot_styles = set(lines.values())
+            styles[attr]['per-line'].update(pot_styles)
                 
         
         # Write LAMMPS force field style setup
