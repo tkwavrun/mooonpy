@@ -41,6 +41,8 @@ molecule = mooonpy.Molspace(filename=file)#, astyles=['full', 'charge'], dsect=[
 molecule.write_files('WRITE.data', atom_style='full')
 molecule.write_files('WRITE.ff.script')
 
+molecule.ff.get_per_line_styles('bond_coeffs')
+
 
 
 
