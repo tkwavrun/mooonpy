@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.7, 3.11, 3.12]
+        python-version: ['3.7', '3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -31,4 +31,4 @@ jobs:
 
       - name: Run tests
         run: |
-          PYTHONPATH=. pytest
+          pytest
