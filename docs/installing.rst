@@ -15,7 +15,7 @@ Install the ``mooonpy`` package (or add it to your ``requirements.txt`` file):
 Using pip locally
 -----------------
 
-Install the ``mooonpy`` package locally in mooonpy/src/ directory:
+Install the ``mooonpy`` package locally in mooonpy/ directory:
 
 Example Directory:
   
@@ -25,7 +25,7 @@ Example Directory:
     GitHub/mooonpy
   
     mooonpy$ ls
-    mooonpy
+    LICENCE  README.md  docs  examples  gpush.sh  pyproject.toml  pytest.ini  src  tests
   
     mooonpy$ tree -L 1
     .
