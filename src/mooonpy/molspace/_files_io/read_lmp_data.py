@@ -231,14 +231,22 @@ def read(mol, filename, sections):
                         reader_name = hard_coded_atom_reading_styles[mol.atoms.style]
                         atom_reader = getattr(mol.atoms.styles, reader_name)
 
-                elif section == 'Bonds' and 'Bonds' not in sections_kwargs:
-                    section = ''
-                elif section == 'Angles' and 'Angles' not in sections_kwargs:
-                    section = ''
-                elif section == 'Dihedrals' and 'Dihedrals' not in sections_kwargs:
-                    section = ''
-                elif section == 'Impropers' and 'Impropers' not in sections_kwargs:
-                    section = ''
+                elif section == 'Bonds':
+                    mol.bonds.style = comment
+                    if 'Bonds' not in sections_kwargs:
+                        section = ''
+                elif section == 'Angles':
+                    mol.angles.style = comment
+                    if 'Angles' not in sections_kwargs:
+                        section = ''
+                elif section == 'Dihedrals':
+                    mol.dihedrals.style = comment
+                    if 'Dihedrals' not in sections_kwargs:
+                        section = ''
+                elif section == 'Impropers':
+                    mol.impropers.style = comment
+                    if 'Impropers' not in sections_kwargs:
+                        section = ''
                 elif section == 'Velocities' and 'Velocities' not in sections_kwargs:
                     section = ''
     
