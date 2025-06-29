@@ -56,7 +56,7 @@ def power_to_db(power: Array1D, ref_power: Number = 1) -> np.ndarray:
     return power_in_dB
 
 
-def butter(ydata: Array1D, wn: Union[Number, str] = 'PSD', order: Number = 2):
+def _butter(ydata: Array1D, wn: float, order: Number) -> np.ndarray:
     """
     Alias for scipy's butterworth low-pass filter.
 
@@ -67,20 +67,13 @@ def butter(ydata: Array1D, wn: Union[Number, str] = 'PSD', order: Number = 2):
     :param order: Order of filter, defaults to 2
     :type order: Number
     """
-    if wn == 'PSD':
-        wns, psd = compute_PSD(xdata, ydata)
-        wn = first_value_cross(wns, psd, cross=None)  # use mean with default
-
-        # y_filt, wn_opt, wns, psd = PSD_cross_optimal_butter(np.arange(len(ydata)), ydata, order=order)
-        # return y_filt
-
     sos = sp.signal.butter(order, wn, btype='low', analog=False, output='sos', fs=None)
     y_filt = sp.signal.sosfiltfilt(sos, ydata, padtype=None)
     return y_filt
 
 
-def butter_QM(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, str] = 'PSD', quadrant: str = 'msr',
-              order: Number = 2) -> np.ndarray:
+def butter_lowpass(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, str] = 'PSD', quadrant: str = 'msr',
+                   order: Number = 2) -> np.ndarray:
     """
     Call butterworth low-pass filter with Quadrant Mirroring padding.
     The original image region is returned fully filtered.
@@ -119,7 +112,7 @@ def butter_QM(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, str] =
     elif len(quadrant) == 3 and ',' in quadrant:
         splits = quadrant.split(',')
         quad_lo = int(splits[0])
-        quad_hi = int(splits[2])
+        quad_hi = int(splits[1])
     elif len(quadrant) == 2:
         quad_lo, quad_hi = int(quadrant[0]), int(quadrant[1])  # works for tuple or string
     else:
@@ -128,7 +121,8 @@ def butter_QM(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, str] =
     # do filtering
     # ------------------------------------
     xdata, ydata, lo_trim, hi_trim = data_extension(xdata, ydata, quad_lo, quad_hi)
-    y_butter = butter(ydata, wn, order=order)
+
+    y_butter = _butter(ydata, wn, order)
     y_filt = y_butter[lo_trim:hi_trim]
     return y_filt
 
@@ -168,7 +162,7 @@ def determine_mirroring_locations(xdata: Optional[Array1D], ydata: Array1D, wn: 
     lo_summed_residuals2 = {}  # {quadrant_mirror:sum-of-residuals-squared}
     for quad in lo_quads2test:
         x_quad, y_quad, lo_ind, hi_ind = data_extension(xdata, ydata, quad, 1)
-        y_butter = butter(y_quad, wn, order)  # filter both
+        y_butter = _butter(y_quad, wn, order)
         y_filt = y_butter[lo_ind:hi_ind]  # get original slice
         residuals = ydata - y_filt
         residuals = residuals[:half_data]  # we only care about the first half fit
@@ -183,7 +177,7 @@ def determine_mirroring_locations(xdata: Optional[Array1D], ydata: Array1D, wn: 
     hi_summed_residuals2 = {}  # {quadrant_mirror:sum-of-residuals-squared}
     for quad in hi_quads2test:
         x_quad, y_quad, lo_ind, hi_ind = data_extension(xdata, ydata, 1, quad)
-        y_butter = butter(y_quad, wn, order)  # filter both
+        y_butter = _butter(y_quad, wn, order)
         y_filt = y_butter[lo_ind:hi_ind]  # get original slice
         residuals = ydata - y_filt
         residuals = residuals[half_data:]  # we only care about the last half fit
