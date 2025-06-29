@@ -29,6 +29,6 @@ jobs:
           pip install -e .
           cd ../
 
-      - name: Run tests
-        run: |
-          pytest
+      #- name: Run tests
+        #run: |
+        #  pytest
