@@ -2,7 +2,7 @@
 import numpy as np
 from copy import deepcopy
 import matplotlib.pyplot as plt
-from typing import Optional, Iterable, Tuple, List, Dict
+from typing import Optional, Tuple, List, Dict
 
 from .math_utils import aggregate_fun
 from .file_utils import Path

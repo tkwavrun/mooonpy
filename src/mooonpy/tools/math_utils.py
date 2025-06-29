@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import scipy as sp
+from scipy.signal import find_peaks
 
 from numbers import Number
 from typing import Union, Tuple, Optional
@@ -62,54 +62,6 @@ def aggregate_fun(fun_name: str, vector: Array1D) -> Number:
         raise Exception(f'ERROR: fun_name {fun_name} not recognized')
 
 
-def compute_PSD(xdata: Array1D, ydata: Array1D) -> Tuple[Array1D, Array1D]:
-    """
-    Compute the Power Spectral Density (PSD) with the X-values being the normalized frequencies.
-
-    Returns the normalized frequencies (Omega N / Wn) and power spectral density (PSD) as a tuple of arrays.
-
-    :param xdata: Array of x values.
-    :type xdata: Array1D
-    :param ydata: Array of y values.
-    :type ydata: Array1D
-    :return: Wnss, PDS's
-    :rtype: Tuple(Array1D, Array1D)
-    """
-    # Define sampling rate and number of data points
-    dx = np.mean(np.abs(np.diff(xdata)))
-    if dx != 0:
-        fs = 1 / dx  # sampling rate
-    else:
-        fs = xdata.shape[0] / (np.max(xdata) - np.min(xdata))
-    N = xdata.shape[0]  # number of data points
-    d = 1 / fs  # sampling space
-
-    # Perform one sided FFT
-    fft_response = np.fft.rfft(ydata, axis=0, norm='backward')
-    x_fft = np.fft.rfftfreq(N, d=d)
-    y_fft = fft_response
-
-    # Compute the final PSD and normalized cutoff frequencies
-    psd = np.real((y_fft * np.conjugate(y_fft)) / N)
-    wns = x_fft / (0.5 * fs)
-    return wns, psd
-
-
-def power_to_db(power: Array1D, ref_power: Number = 1) -> np.ndarray:
-    """
-    Convert power to decibels (dB).
-
-    :param power: Power to convert.
-    :type power: Array1D
-    :param ref_power: Reference power.
-    :type ref_power: Number
-    :return: Converted power.
-    :rtype: Array1D
-    """
-    power_in_dB = 10 * np.log10(power / ref_power)
-    return power_in_dB
-
-
 def find_peaks_and_valleys(xdata: Array1D, ydata: Array1D, prominence: Optional[Number] = None) -> Tuple[
     np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
@@ -130,15 +82,15 @@ def find_peaks_and_valleys(xdata: Array1D, ydata: Array1D, prominence: Optional[
     """
     # Find peaks
     peaks, properties = find_peaks(ydata, prominence=prominence)
-    xpeaks = xdata[peaks];
+    xpeaks = xdata[peaks]
     ypeaks = ydata[peaks]
 
     # Find valleys
     xvalleys, yvalleys = [], []
     if len(xpeaks) >= 2 and len(ypeaks) >= 2:
         for i in range(len(peaks) - 1):
-            lo = peaks[i];
-            hi = peaks[i + 1];
+            lo = peaks[i]
+            hi = peaks[i + 1]
             between_peaksx = xdata[lo:hi]
             between_peaksy = ydata[lo:hi]
             minimum_index = np.min(np.where(between_peaksy == between_peaksy.min())[0])
@@ -151,7 +103,8 @@ def find_peaks_and_valleys(xdata: Array1D, ydata: Array1D, prominence: Optional[
 
 def compute_derivative(xdata: Array1D, ydata: Array1D) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Function to compute the 1st and 2nd order central derivatives. Edges are not considered, and trimmed x array is returned.
+    Function to compute the 1st and 2nd order central derivatives.
+    Edges are not considered, so trimmed x array is returned.
 
     :param xdata: Array of x values.
     :type xdata: Array1D
@@ -181,13 +134,14 @@ def compute_derivative(xdata: Array1D, ydata: Array1D) -> Tuple[np.ndarray, np.n
     return dxn, dy1, dy2
 
 
-def compute_fringe_slope(strain: Array1D, stress: Array1D, min_strain: Optional[Number] = None,
-                         max_strain: Optional[Number] = None, direction: str = 'forward'):
+def compute_fringe_slope(strain: np.ndarray, stress: np.ndarray, min_strain: Optional[Number] = None,
+                         max_strain: Optional[Number] = None, direction: str = 'forward') -> Tuple[
+    np.ndarray, np.ndarray]:
     """
     Compute fringe slope
 
     .. TODO::
-        Most concice writeup and a link to the paper
+        Most concise writeup and a link to the paper
 
     :param strain: Strain
     :type strain: Array1D
@@ -199,6 +153,9 @@ def compute_fringe_slope(strain: Array1D, stress: Array1D, min_strain: Optional[
     :type max_strain: Optional(Number)
     :param direction: Direction, Must be 'forward' or 'backward', flips both vectors, defaults to 'forward'.
     :type direction: str
+
+    :return: Fringe slope X and Y
+    :rtype: Tuple[np.ndarray, np.ndarray]
     """
     # Set direction
     if direction == 'forward':
@@ -215,6 +172,32 @@ def compute_fringe_slope(strain: Array1D, stress: Array1D, min_strain: Optional[
     if min_strain is None: min_strain = min(strain)
     if max_strain is None: max_strain = max(strain)
 
+    ## Vectorized is much quicker but there's an off by 1 error
+    #
+    # n = np.arange(0, len(strain))
+    # slice_ = (min_strain <= strain) & (strain <= max_strain) & (n >= 4)
+    #
+    # sum_xi = np.cumsum(strain)
+    # sum_yi = np.cumsum(stress)
+    # sum_xi_2 = np.cumsum(strain*strain)
+    # sum_yi_2 = np.cumsum(stress*stress)
+    # sum_xi_yi = np.cumsum(strain*stress)
+    #
+    # sum_xi = sum_xi[slice_]
+    # sum_yi = sum_yi[slice_]
+    # sum_xi_2 = sum_xi_2[slice_]
+    # sum_yi_2 = sum_yi_2[slice_]
+    # sum_xi_yi = sum_xi_yi[slice_]
+    # n = n[slice_]
+    # fringe = strain[slice_]
+    #
+    # SSxy = sum_xi_yi - (sum_xi * sum_yi / n)
+    # SSxx = sum_xi_2 - (sum_xi * sum_xi / n)
+    # slopes = SSxy / SSxx
+    #
+    # return fringe, slopes
+
+    ## Original non-vectorized
     # Start the walked linear regression method
     slopes, fringe = [], []
     sum_xi, sum_yi, sum_xi_2, sum_yi_2, sum_xi_yi, n = 0, 0, 0, 0, 0, 0
@@ -238,4 +221,24 @@ def compute_fringe_slope(strain: Array1D, stress: Array1D, min_strain: Optional[
 
             slopes.append(b1)
             fringe.append(x)
+
     return np.array(fringe), np.array(slopes)
+
+
+def first_value_cross(xdata: Array1D, ydata: Array1D, cross: Optional[Number] = None):
+    """
+    Find x location of the first time the y data crosses a value of the y data.
+
+    :param xdata: X data
+    :type xdata: Array1D
+    :param ydata: Y data
+    :type ydata: Array1D
+    :param cross: Value to compare against, defaults to None, which uses the mean value of ydata
+    :type cross: Number
+    :return: First x location
+    :rtype: Number
+    """
+    if cross is None:
+        cross = np.mean(ydata)
+    x_cross = xdata[np.min(np.where(ydata < cross)[0])]
+    return x_cross
