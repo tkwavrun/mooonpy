@@ -1,3 +1,4 @@
+![Tests](https://github.com/jdkemppa/mooonpy/actions/workflows/unit_tests.yml/badge.svg)
 # mooonpy
 This repository is the start of the re-writing of LUNAR (https://github.com/CMMRLab/LUNAR), to allow LUNAR's abilities to be easily scriptable in Python and allow for quicker and easier generation of documentation using doc strings and sphinx. This repository will eventually be added to PyPi, but during the initial development will be used as a locally installed version using pip
 
