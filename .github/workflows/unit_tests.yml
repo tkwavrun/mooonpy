@@ -1,5 +1,5 @@
 # https://www.youtube.com/watch?v=DhUpxWjOhME&list=PLpdeFUAeHiEfI0PRmIleyzZ1-wBcpDOeU&index=29
-name: Python Tests
+name: Tests
 
 on: [push, pull_request]
 
