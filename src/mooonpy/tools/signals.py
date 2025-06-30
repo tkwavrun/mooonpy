@@ -73,7 +73,7 @@ def _butter(ydata: Array1D, wn: float, order: Number) -> np.ndarray:
 
 
 def butter_lowpass(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, str] = 'PSD', quadrant: str = 'msr',
-                   order: Number = 2) -> np.ndarray:
+                   order: Number = 2) -> Tuple[np.ndarray,Number,str]:
     """
     Call butterworth low-pass filter with Quadrant Mirroring padding.
     The original image region is returned fully filtered.
@@ -94,6 +94,7 @@ def butter_lowpass(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, s
     :param order: Order of filter, defaults to 2
     :type order: Number
 
+    :return: Filtered data, wn used, qm string used
     """
     # Scrub inputs
     # ------------------------------------
@@ -124,7 +125,7 @@ def butter_lowpass(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, s
 
     y_butter = _butter(ydata, wn, order)
     y_filt = y_butter[lo_trim:hi_trim]
-    return y_filt
+    return y_filt, wn, f'{quad_lo},{quad_hi}'
 
 
 def determine_mirroring_locations(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, str] = 'PSD',
