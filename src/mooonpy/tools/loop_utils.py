@@ -54,7 +54,7 @@ class CartesianResult(dict):
         self.dimension_indices = dimension_indices or {}
         self.combined_indices = combined_indices or {}
 
-    def format(self, strings: Union[str | Path, List[str | Path], Dict[Any, str | Path]]) -> Union[
+    def string_format(self, strings: Union[str | Path, List[str | Path], Dict[Any, str | Path]]) -> Union[
         str | Path, List[str | Path], Dict[Any, str | Path]]:
         """
         Format strings with {var} using the CartesianResult dict.
@@ -449,10 +449,10 @@ if __name__ == "__main__":
         if i >= 3:  # Show first 3
             break
         print(f"\n  Combination {i + 1}: {dict(result)}")
-        print(f"    String: {result.format(template_str)}")
-        print(f"    Path: {result.format(template_path)}")  # Returns Path object
+        print(f"    String: {result.string_format(template_str)}")
+        print(f"    Path: {result.string_format(template_path)}")  # Returns Path object
 
-        formatted_dict = result.format(template_dict)
+        formatted_dict = result.string_format(template_dict)
         print(f"    Dict templates:")
         for key, path in formatted_dict.items():
             print(f"      {key}: {path} {'(Path)' if isinstance(path, Path) else '(str)'}")
