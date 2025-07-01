@@ -107,6 +107,7 @@ def butter_lowpass(xdata: Optional[Array1D], ydata: Array1D, wn: Union[Number, s
     if wn == 'PSD':
         wns, psd = compute_PSD(xdata, ydata)
         wn = first_value_cross(wns, psd)
+        if wn == 0: wn=wns[1] # use the lowest allowed value
 
     if quadrant == 'msr':
         quad_lo, quad_hi = determine_mirroring_locations(xdata, ydata, wn, order)

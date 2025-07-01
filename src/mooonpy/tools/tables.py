@@ -60,6 +60,7 @@ class Table(object):
         # These are output formatting variables, currently not kwarg'd into existence
         self.delim = '\t'
         self.cell = '{:<8}'
+        self.float_cell = '{:<8.2f}'
         self.spacer = None
         self.header = True
 
@@ -161,6 +162,7 @@ class Table(object):
         top_flag = bool(self.headers()) and self.header
         shape = self.shape()
         cell = self.cell  # keep self if changes outside?
+        float_cell = self.float_cell
         delim = self.delim
         if self.spacer is not None:
             if left_flag:
@@ -195,7 +197,11 @@ class Table(object):
             if left_flag:
                 line += cell.format(self.rowlabels()[row_index]) + delim
             for col_index in range(shape[1]):
-                line += cell.format(self.rowcol(row_index, col_index)) + delim
+                value = self.rowcol(row_index, col_index)
+                if isinstance(value, float):
+                    line += float_cell.format(value) + delim
+                else:
+                    line += cell.format(value) + delim
             yield line
 
         if space_line: yield space_line
@@ -301,10 +307,19 @@ class ListListTable(Table):
             self.grid = from_listlist
         elif shape is not None:
             if hasattr(self, 'default'):
-                self.grid = [[self.default] * shape[1]] * shape[0]
+                # self.grid = [[self.default] * shape[1]] * shape[0]
+                self.grid = []
+                for rr in range(shape[0]):
+                    self.grid.append([])
+                    for cc in range(shape[1]):
+                        self.grid[rr].append(default)
             else:
-                self.grid = [[None] * shape[1]] * shape[
-                    0]  # empty does not make sense in this case, using None as default
+                # self.grid = [[None] * shape[1]] * shape[0]  # empty does not make sense in this case, using None as default
+                self.grid = []
+                for rr in range(shape[0]):
+                    self.grid.append([])
+                    for cc in range(shape[1]):
+                        self.grid[rr].append(None)
         else:
             self.grid = []
 

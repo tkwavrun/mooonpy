@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..tools.math_utils import compute_fringe_slope, compute_derivative, find_peaks_and_valleys
-from ..tools.signals import butter_lowpass
+from ..tools.signals import butter_lowpass, compute_PSD
 from .program import ProgramResults
 
 import numpy as np
@@ -110,7 +110,9 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_stress'].plot(x_yield, y_yield, 'ro', label='Yield Point')
         else:
             # No yield found with prominence.
-            pass
+            # yield_index = len(strain) - 1
+            yield_index = hi_index
+
 
         results.yield_index = yield_index
         results.x_yield = x_yield
@@ -131,7 +133,7 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(trans_1_x, trans_1_y, 'bo--', label='Transverse 1 Fit')
         else:
             trans_1_coeff = [None, None]
-        results.trans_1_poi = trans_1_coeff[0]
+        results.trans_1_poi = -trans_1_coeff[0]
 
         if trans_2 is not None:
             trans_2_filt, wn, qm = butter_lowpass(strain, trans_2)
@@ -145,7 +147,7 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(trans_2_x, trans_2_y, 'ro--', label='Transverse 2 Fit')
         else:
             trans_2_coeff = [None, None]
-        results.trans_2_poi = trans_2_coeff[0]
+        results.trans_2_poi = -trans_2_coeff[0]
 
         # --------------------------------------------
         # Cleanup
