@@ -4,7 +4,7 @@ from collections import defaultdict
 from typing import Dict, List, Tuple, Union, Any, Optional, Iterator, Iterable
 from dataclasses import dataclass
 
-from .file_utils import Path
+from . file_utils import Path
 
 
 @dataclass
@@ -21,6 +21,7 @@ class DimensionInfo:
     """Information about a parsed dimension including base and conditional entries."""
     base: DimensionEntry
     conditionals: List[DimensionEntry]
+    parallels: List[DimensionEntry]
     size: int
 
 
@@ -151,12 +152,14 @@ class Cartesian:
             # Find base entry (no condition) and conditional entries
             base_entry: Optional[DimensionEntry] = None
             conditional_entries: List[DimensionEntry] = []
-
+            parallel_entries: List[DimensionEntry] = []
             for entry in entries:
-                if entry.condition is None:
-                    base_entry = entry
-                else:
+                if entry.condition is not None:
                     conditional_entries.append(entry)
+                elif entry.name != entry.cart_key:
+                    parallel_entries.append(entry)
+                else:
+                    base_entry = entry
 
             if base_entry is None:
                 raise ValueError(f"Dimension '{dimension}' must have at least one unconditional entry")
@@ -164,6 +167,7 @@ class Cartesian:
             dim_info = DimensionInfo(
                 base=base_entry,
                 conditionals=conditional_entries,
+                parallels=parallel_entries,
                 size=len(base_entry.iterable)
             )
 
@@ -215,6 +219,10 @@ class Cartesian:
                 # Add base values
                 base_entry = dim_info.base
                 result[base_entry.name] = base_entry.iterable[dim_idx]
+
+                # Add parallel values
+                for para in self.dimensions[dim_name].parallels:
+                    result[para.name] = para.iterable[dim_idx]
 
                 # Check for conditional values
                 triggered_conditionals: List[DimensionEntry] = []
@@ -347,6 +355,7 @@ if __name__ == "__main__":
 
     basic_sets = {
         'material': ['steel', 'aluminum'],  # List of strings
+        'material.ele':['Fe','Al'], # element symbols
         'size': range(10, 21, 10),  # Range object (10, 20)
         'temp': [300, 400],  # List of numbers
         'active': [True, False]  # Boolean values
@@ -485,7 +494,8 @@ if __name__ == "__main__":
         'algorithm.0.param': ['alpha', 'beta'],  # A gets param alpha/beta
         'algorithm.1.param': ['gamma'],  # B gets param gamma
         'algorithm.2.param': ['delta', 'epsilon'],  # C gets param delta/epsilon
-        'algorithm.1.special': ['turbo', 'ultra'],  # B also gets special mode
+        'algorithm.1.special': ['turbo', 'ultra'],  # B also gets special mode. Not sure if I like this behavior, but also do not see a use for it
+        'algorithm.cost':[5,10,20], # Base parallel dim
         'dataset': ['small', 'large']  # Independent
     }
 
@@ -495,10 +505,11 @@ if __name__ == "__main__":
     print("\nAll complex conditional combinations:")
     for i, result in enumerate(complex_cart.generate()):
         alg = result['algorithm']
+        cost = result['cost']
         param = result.get('param', 'none')
         special = result.get('special', 'none')
         dataset = result['dataset']
-        print(f"  {i + 1}: {alg} + {param} + special:{special} + {dataset}")
+        print(f"  {i + 1}: {alg}/{cost}+ {param} + special:{special} + {dataset}")
 
     # Example 8: Edge Cases and Error Handling
     print("\n8. EDGE CASES - Boundary conditions and error handling")

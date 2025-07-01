@@ -60,7 +60,7 @@ class Table(object):
         # These are output formatting variables, currently not kwarg'd into existence
         self.delim = '\t'
         self.cell = '{:<8}'
-        self.float_cell = '{:<8.2f}'
+        self.float_cell = '{:< 8.3f}'
         self.spacer = None
         self.header = True
 
@@ -198,7 +198,9 @@ class Table(object):
                 line += cell.format(self.rowlabels()[row_index]) + delim
             for col_index in range(shape[1]):
                 value = self.rowcol(row_index, col_index)
-                if isinstance(value, float):
+                if value is  None:
+                    line +=  delim
+                elif isinstance(value, float):
                     line += float_cell.format(value) + delim
                 else:
                     line += cell.format(value) + delim
@@ -331,6 +333,10 @@ class ListListTable(Table):
             self.rows = rows
         else:
             self.rows = None
+
+    def append(self, row):
+        """Append to ehd of grid"""
+        self.grid.append(row)
 
     def shape(self) -> Tuple[Optional[int], Optional[int]]:
         n_rows = len(self.grid)

@@ -13,3 +13,15 @@ class ProgramResults(object):
     @classmethod
     def new_log(cls):
         return [] # probably make this a class inheriting from list?
+
+    def to_dict(self,names):
+        out = {}
+        for name in names:
+            out[name] = getattr(self, name) # Crash here is operator error
+        return out
+
+    def to_list(self,names):
+        out = []
+        for name in names:
+            out.append(getattr(self, name)) # Crash here is operator error
+        return out

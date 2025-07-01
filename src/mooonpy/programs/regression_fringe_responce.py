@@ -14,7 +14,7 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
         # --------------------------------------------
         # Setup
         results = ProgramResults('RFR_tensile_analysis')
-        results.program_version = '1.0: 30-Jun-25'
+        results.program_version = '1.0: 01-Jul-25'
         if log is None:
             log = ProgramResults.new_log()  # just a list currently
 
@@ -55,9 +55,12 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
         # Determine Linear region
         lo, mid, hi, fr2_fringe, fr2_slopes = _forward_backward_forward(strain, stress_filt, min_xhi, max_xhi,
                                                                         _plt_fbf=axies['plt_fbf'])
-        results.lo = lo
-        results.mid = mid
-        results.hi = hi
+        results.lox = lo[0]
+        results.loy = lo[1]
+        results.midx = mid[0]
+        results.mixy = mid[1]
+        results.hix = hi[0]
+        results.hiy = hi[1]
 
         if axies['plt_stress'] is not None:
             axies['plt_stress'].plot([lo[0], hi[0]], [lo[1], hi[1]], 'go', label='Linear region')
@@ -83,6 +86,10 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
         reduced_fringe = fr2_fringe[fr2_max_index:-1]
         reduced_slopes = fr2_slopes[fr2_max_index:-1]
         dstrain, dslopes1, dslopes2 = compute_derivative(reduced_fringe, reduced_slopes)
+
+        results.dstrain = dstrain
+        results.dslopes1 = dslopes1
+        results.dslopes2 = dslopes2
 
         # Step2: Find peaks and valleys of the 2nd derivative using tuned standard deviations
         prominence = np.std(dslopes2) / 3
