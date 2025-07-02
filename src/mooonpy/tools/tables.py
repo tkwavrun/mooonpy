@@ -4,8 +4,10 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from typing import Optional, Tuple, List, Dict
 
+from .string_utils import _col_convert
 from .math_utils import aggregate_fun
 from .file_utils import Path
+
 
 class Table(object):
     """
@@ -111,7 +113,7 @@ class Table(object):
         for line in self.yield_line():
             print(line)
 
-    def csv(self, file: Path, append=False, skip_header=False):
+    def csv(self, file: Path | str, append=False, skip_header=False):
         """
         Write table to csv file
         """
@@ -198,8 +200,8 @@ class Table(object):
                 line += cell.format(self.rowlabels()[row_index]) + delim
             for col_index in range(shape[1]):
                 value = self.rowcol(row_index, col_index)
-                if value is  None:
-                    line +=  delim
+                if value is None:
+                    line += delim
                 elif isinstance(value, float):
                     line += float_cell.format(value) + delim
                 else:
@@ -506,6 +508,59 @@ class ColTable(Table):
             if hasattr(self, 'default'):
                 return self.default
         raise Exception(f'ERROR: ColTable row {row_key} and col {key} could not find a match or default')
+
+    @classmethod
+    def read_csv(cls, file: Path | str, header=True, rowlabels=False, keep_list=None):
+        """
+        Read csv file into columns
+        """
+        file = Path(file)
+        file_obj = file.open(mode='r')
+        columns = {}
+        corner = None
+        rows = None
+        if keep_list is None: keep_list = []
+
+        try:
+            for ii, line in enumerate(file_obj):
+                line = line.strip()
+                splits = line.split(',')
+
+                if ii == 0:
+                    if header:
+                        if rowlabels:
+                            corner = splits[0].strip()
+                            keys = [key.strip() for key in splits[1:]]
+                            rows = []
+                        else:
+                            keys = [key.strip() for key in splits]
+                    else:
+                        if rowlabels:
+                            keys = list(range(len(splits) - 1))
+                            rows = []
+                        else:
+                            keys = list(range(len(splits)))
+                    if keys[-1] == '': keys.pop(-1) # remove trailing comma
+                    columns = {key: list() for key in keys}
+                else:
+                    if rowlabels:
+                        rows.append(splits[0].strip())
+                        for key, value in zip(keys, splits[1:]):
+                            columns[key].append(value.strip())
+                    else:
+                        for key, value in zip(keys, splits):
+                            columns[key].append(value.strip())
+        except:
+            raise Exception(f'ERROR: CSV line {ii} :{line} could not read from {file}')
+
+        for ii, (key, vector) in enumerate(columns.items()):
+            if ii in keep_list or key in keep_list: continue
+            try:
+                columns[key] = _col_convert(vector)  # string to float converter
+            except:
+                pass  # keep as list of strings
+
+        return ColTable(from_dict=columns, cornerlabel=corner, rows=rows)
 
 
 # %%

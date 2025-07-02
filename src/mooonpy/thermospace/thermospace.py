@@ -51,7 +51,7 @@ class Thermospace(ColTable):
         return self.shape()[0]
 
     @classmethod
-    def basic_read(cls, file: [Path, str], silence_error_line: bool = False) -> 'Thermospace':
+    def basic_read(cls, file: Union[Path, str], silence_error_line: bool = False) -> 'Thermospace':
         return readlog_basic(file, silence_error_line=silence_error_line)
 
 ## This should be refactored into _files_io but imports are being weird

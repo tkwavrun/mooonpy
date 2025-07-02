@@ -140,7 +140,7 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(trans_1_x, trans_1_y, 'bo--', label='Transverse 1 Fit')
         else:
             trans_1_coeff = [None, None]
-        results.trans_1_poi = -trans_1_coeff[0]
+        results.trans_1_poi = -trans_1_coeff[1]
 
         if trans_2 is not None:
             trans_2_filt, wn, qm = butter_lowpass(strain, trans_2)
@@ -154,7 +154,7 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(trans_2_x, trans_2_y, 'ro--', label='Transverse 2 Fit')
         else:
             trans_2_coeff = [None, None]
-        results.trans_2_poi = -trans_2_coeff[0]
+        results.trans_2_poi = -trans_2_coeff[1]
 
         # --------------------------------------------
         # Cleanup
@@ -219,7 +219,7 @@ def rfr_labeler(axies):
             pass
 
 
-def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None):
+def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None,maximize=True):
     # --------------------------------------------------------
     # Compute the forward-backwards-forwards fringe response
     # --------------------------------------------------------
@@ -230,7 +230,10 @@ def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None):
     if max_xhi is not None: max_strain_fr1 = max_xhi
     fr1_fringe, fr1_slopes = compute_fringe_slope(strain, stress, min_strain=min_strain_fr1,
                                                   max_strain=max_strain_fr1, direction='forward')
-    fr1_max_index = np.argmax(fr1_slopes)
+    if maximize:
+        fr1_max_index = np.argmax(fr1_slopes)
+    else:
+        fr1_max_index = np.argmin(fr1_slopes)
     fr1_max_slope = fr1_slopes[fr1_max_index]
     fr1_max_fringe = fr1_fringe[fr1_max_index]
 
@@ -247,8 +250,10 @@ def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None):
 
     br1_fringe, br1_slopes = compute_fringe_slope(reduced_strain, reduced_stress, min_strain=min_strain_br1,
                                                   max_strain=max_strain_br1, direction='reverse')
-
-    br1_max_index = np.argmax(br1_slopes)
+    if maximize:
+        br1_max_index = np.argmax(br1_slopes)
+    else:
+        br1_max_index = np.argmin(br1_slopes)
     br1_max_slope = br1_slopes[br1_max_index]
     br1_max_fringe = br1_fringe[br1_max_index]
     br1_max_index_absolute = np.argmin(np.abs(strain - br1_max_fringe))  # equivalent to .index
@@ -264,7 +269,10 @@ def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None):
     reduced_stress = stress[br1_max_index_absolute:-1]
     fr2_fringe, fr2_slopes = compute_fringe_slope(reduced_strain, reduced_stress, min_strain=min_strain_fr2,
                                                   max_strain=max_strain_fr2, direction='forward')
-    fr2_max_index = np.argmax(fr2_slopes)
+    if maximize:
+        fr2_max_index = np.argmax(fr2_slopes)
+    else:
+        fr2_max_index = np.argmin(fr2_slopes)
     fr2_max_slope = fr2_slopes[fr2_max_index]
     fr2_max_fringe = fr2_fringe[fr2_max_index]
     fr2_max_index_absolute = np.argmin(np.abs(strain - fr2_max_fringe))  # equivalent to .index
