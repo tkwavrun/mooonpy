@@ -59,10 +59,10 @@ if __name__ == '__main__':
         m = mooonpy.Molspace(filename=file, read='mooonpy', astyles=['all', 'full'])
         m.write_files('WRITE.data', atom_style='full')
     
-    # number = 1
-    # print('\n\n')
-    # mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
-    # print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
+    number = 1
+    print('\n\n')
+    mooonpy_time = timeit.timeit(stmt=call_mooonpy, number=number)
+    print(f'mooonpy read time  : {mooonpy_time} seconds for {number} runs on 100,000 atom system')
     
     
 
