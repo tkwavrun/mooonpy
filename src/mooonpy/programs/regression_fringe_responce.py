@@ -137,7 +137,7 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(strain, trans_1_filt, 'b-.', label='Filtered Transverse 1')
                 trans_1_x = np.array([redused_strain[0], redused_strain[-1]])
                 trans_1_y = trans_1_coeff[1] * trans_1_x + trans_1_coeff[0]
-                axies['plt_trans'].plot(trans_1_x, trans_1_y, 'bo--', label='Transverse 1 Fit')
+                axies['plt_trans'].plot(trans_1_x, trans_1_y, 'bo--', label='Transverse 1 Fit: {:2.3f}'.format(-trans_1_coeff[1]))
         else:
             trans_1_coeff = [None, None]
         results.trans_1_poi = -trans_1_coeff[1]
@@ -151,7 +151,7 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(strain, trans_2_filt, 'r-.', label='Filtered Transverse 2')
                 trans_2_x = np.array([redused_strain[0], redused_strain[-1]])
                 trans_2_y = trans_2_coeff[1] * trans_2_x + trans_2_coeff[0]
-                axies['plt_trans'].plot(trans_2_x, trans_2_y, 'ro--', label='Transverse 2 Fit')
+                axies['plt_trans'].plot(trans_2_x, trans_2_y, 'ro--', label='Transverse 2 Fit: {:2.3f}'.format(-trans_2_coeff[1]))
         else:
             trans_2_coeff = [None, None]
         results.trans_2_poi = -trans_2_coeff[1]

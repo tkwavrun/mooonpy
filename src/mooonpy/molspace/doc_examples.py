@@ -275,7 +275,7 @@ def butter(N, Wn, btype='low', analog=False, output='ba', fs=None):
     >>> import matplotlib.pyplot as plt
     >>> import numpy as np
 
-    >>> b, a = signal.butter(4, 100, 'low', analog=True)
+import tools.signals    >>> b, a = tools.signals.butter(4, 100, 'low', analog=True)
     >>> w, h = signal.freqs(b, a)
     >>> plt.semilogx(w, 20 * np.log10(abs(h)))
     >>> plt.title('Butterworth filter frequency response')
@@ -300,7 +300,7 @@ def butter(N, Wn, btype='low', analog=False, output='ba', fs=None):
     format when filtering, to avoid numerical error with transfer function
     (``ba``) format):
 
-    >>> sos = signal.butter(10, 15, 'hp', fs=1000, output='sos')
+import tools.signals    >>> sos = tools.signals.butter(10, 15, 'hp', fs=1000, output='sos')
     >>> filtered = signal.sosfilt(sos, sig)
     >>> ax2.plot(t, filtered)
     >>> ax2.set_title('After 15 Hz high-pass filter')
