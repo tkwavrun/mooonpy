@@ -3,23 +3,85 @@ from ..tools.math_utils import compute_fringe_slope, compute_derivative, find_pe
 from ..tools.signals import butter_lowpass, compute_PSD
 from .program import ProgramResults
 
+from numbers import Number
+from typing import Union, Optional, List
 import numpy as np
 from numpy.polynomial.polynomial import polyfit
 import matplotlib.pyplot as plt
 
 
-def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=None, max_xhi=None, wn='PSD', order=2,
-                         qm='msr', log=None, plots='all') -> ProgramResults:
+def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Optional[np.ndarray] = None,
+                         trans_2: Optional[np.ndarray] = None, min_xhi: Optional[Number] = None,
+                         max_xhi: Optional[Number] = None, wn: Union[Number, str] = 'PSD', order: Number = 2,
+                         qm: str = 'msr', log: Optional[list] = None, plots: Union[str,List] = 'all') -> ProgramResults:
+    """
+    Implementation of the Regression Fringe Response Modulus Method Tensile Analysis.
+
+    Returns results in a Program object as attributes
+
+    **Result Attributes**
+        - program_name: str
+        - program_version: str
+        - log: Log object
+        - stress_wn: float. Cutoff used for stress filter
+        - stress_qm: str. quadrant mirror setting used for stress filter
+        - offset: float. Offset of stress after filtering
+        - stress_filt: vector. Filtered stress signal
+        - lox: float. Lower bound of linear region strain
+        - loy: float. Lower bound of linear region stress
+        - midx: float. First pass FBF strain
+        - midy: float. First pass FBF stress
+        - hix: float. Higher bound of linear region strain
+        - hiy: float. Higher bound of linear region stress
+        - lo_index: int. index of lower bound
+        - hi_index: int. index of higher bound
+        - x_intercept: float. Intercept of linear region
+        - youngs_modulus: float. Young's modulus from linear region
+        - dstrain: vector. x values from derivative of fringe slope
+        - dslopes1: vector. 1st derivative 2nd forward of fringe slope
+        - dslopes2: vector. 2nd derivative 2nd forward of fringe slope
+        - yield_index: int. index of yield. Falls back to linear region upper bound.
+        - yield_x: float. yield strain, will be None if not found
+        - yield_y: float. yield stress, will be None if not found
+        - figs: dict. Dictionary of matplotlib fig objects.
+        - axies: dict. Dictionary of matplotlib axes objects.
+
+    :param strain: Strain
+    :type strain: np.ndarray
+    :param stress: Stress
+    :type stress: np.ndarray
+    :param trans_1: Transverse strain 1
+    :type trans_1: np.ndarray
+    :param trans_2: Transverse strain 2
+    :type trans_2: np.ndarray
+    :param min_xhi: Minimum value of xhi, or the smallest span of the elastic region. default None -> min(strain)
+    :type min_xhi: Number
+    :param max_xhi: Maximum value of xhi, considered for the elastic region. default None -> max(strain)
+    :type max_xhi: Number | str
+    :param wn: Butterworth lowpass filter cutoff. default 'PSD' to use optimization method. may also be 'off' to disable.
+    :type wn: Number
+    :param order: Order of the Butterworth lowpass filter. default 2
+    :type order: Number
+    :param qm: Quadrant Mirror padding setting, as '1,1' as outlined in extend_data. default 'msr' to use optimization method.
+    :type qm: str
+    :param log: Currently not implemented.
+    :type log: list
+    :param plots: 'all' to plot all plots in individual frames, or 'quad' to plot 4 figures in one frame. lists of figure stings select which plots to use.
+    :type plots: str | list
+    :returns: Object containing results of Tensile Analysis
+    :rtype: ProgramResults
+
+    """
     try:
         # --------------------------------------------
         # Setup
         results = ProgramResults('RFR_tensile_analysis')
-        results.program_version = '1.0: 01-Jul-25'
+        results.program_version = '1.1: 03-Jul-25'
         if log is None:
             log = ProgramResults.new_log()  # just a list currently
 
         results.input_settings = {'min_xhi': min_xhi, 'max_xhi': max_xhi, 'wn': wn, 'order': order, 'qm': qm}
-        axies = rfr_plotter(plots)
+        figs, axies = rfr_plotter(plots)
 
         # --------------------------------------------
         # Filtering
@@ -77,7 +139,8 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
         results.youngs_modulus = youngs_modulus_coeffs[1]
 
         if axies['plt_stress'] is not None:
-            axies['plt_stress'].plot(youngs_modulus_x, youngs_modulus_y, 'g--', label='Linear Fit')
+            axies['plt_stress'].plot(youngs_modulus_x, youngs_modulus_y, 'g--',
+                                     label='Linear Fit: E = {:4.1f}'.format(youngs_modulus_coeffs[1]))
 
         # --------------------------------------------
         # Find yield
@@ -110,16 +173,16 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
             if axies['plt_peaks'] is not None:
                 axies['plt_peaks'].plot(xpeaks, ypeaks, 'g^', label='Peaks')
                 axies['plt_peaks'].plot(xvalleys, yvalleys, 'rv', label='Valleys')
-                axies['plt_peaks'].plot([xvalleys[0], xvalleys[0]], [min(dslopes2), max(dslopes2)], 'r--',
-                                        label='Yield strain')
+                axies['plt_peaks'].plot([x_yield, x_yield], [min(dslopes2), max(dslopes2)], 'r--',
+                                        label='Yield strain: ε = {:2.5f}'.format(x_yield))
 
             if axies['plt_stress'] is not None:
-                axies['plt_stress'].plot(x_yield, y_yield, 'ro', label='Yield Point')
+                axies['plt_stress'].plot(x_yield, y_yield, 'ro',
+                                         label='Yield Point: ({:2.5f}, {:5.2f})'.format(x_yield, y_yield))
         else:
             # No yield found with prominence.
             # yield_index = len(strain) - 1
             yield_index = hi_index
-
 
         results.yield_index = yield_index
         results.x_yield = x_yield
@@ -137,7 +200,8 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(strain, trans_1_filt, 'b-.', label='Filtered Transverse 1')
                 trans_1_x = np.array([redused_strain[0], redused_strain[-1]])
                 trans_1_y = trans_1_coeff[1] * trans_1_x + trans_1_coeff[0]
-                axies['plt_trans'].plot(trans_1_x, trans_1_y, 'bo--', label='Transverse 1 Fit: {:2.3f}'.format(-trans_1_coeff[1]))
+                axies['plt_trans'].plot(trans_1_x, trans_1_y, 'bo--',
+                                        label='Transverse 1 Fit: nu = {:2.3f}'.format(-trans_1_coeff[1]))
         else:
             trans_1_coeff = [None, None]
         results.trans_1_poi = -trans_1_coeff[1]
@@ -151,7 +215,8 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
                 axies['plt_trans'].plot(strain, trans_2_filt, 'r-.', label='Filtered Transverse 2')
                 trans_2_x = np.array([redused_strain[0], redused_strain[-1]])
                 trans_2_y = trans_2_coeff[1] * trans_2_x + trans_2_coeff[0]
-                axies['plt_trans'].plot(trans_2_x, trans_2_y, 'ro--', label='Transverse 2 Fit: {:2.3f}'.format(-trans_2_coeff[1]))
+                axies['plt_trans'].plot(trans_2_x, trans_2_y, 'ro--',
+                                        label='Transverse 2 Fit: nu = {:2.3f}'.format(-trans_2_coeff[1]))
         else:
             trans_2_coeff = [None, None]
         results.trans_2_poi = -trans_2_coeff[1]
@@ -160,6 +225,8 @@ def RFR_tensile_analysis(strain, stress, trans_1=None, trans_2=None, min_xhi=Non
         # Cleanup
         rfr_labeler(axies)
         results.log = log
+        results.figs = figs
+        results.axies = axies
         return results
 
     except:
@@ -175,6 +242,19 @@ def rfr_plotter(plots='all'):
         for plot in all_plots:
             axies[plot] = None
             figs[plot] = None
+    elif 'quad' in plots:
+        if plots == 'quad':
+            plots = all_plots
+        else:
+            plots = plots[1:]
+        if len(plots) == 4:
+            fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+            for plot, ax in zip(plots, [ax1, ax2, ax3, ax4]):
+                figs[plot] = fig  # copy
+                axies[plot] = ax  # reference
+        else:
+            raise Exception('ERROR: RFR_tensile_analysis only supports quad plots.')
+
     elif plots == 'all':
         for plot in all_plots:
             figs[plot], axies[plot] = plt.subplots()
@@ -185,7 +265,7 @@ def rfr_plotter(plots='all'):
             else:
                 axies[plot] = None
                 figs[plot] = None
-    return axies
+    return figs, axies
 
 
 def rfr_labeler(axies):
@@ -219,7 +299,7 @@ def rfr_labeler(axies):
             pass
 
 
-def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None,maximize=True):
+def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None, maximize=True):
     # --------------------------------------------------------
     # Compute the forward-backwards-forwards fringe response
     # --------------------------------------------------------

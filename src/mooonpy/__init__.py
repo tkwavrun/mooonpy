@@ -10,7 +10,7 @@ from .molspace import doc_examples as DocExamples
 from .thermospace.thermospace import Thermospace as Thermospace ## TDM
 from .tools.file_utils import Path as Path ## TDM
 
-# from .rcsetup import rcParams
+from .rcsetup import rcParams
 
 __all__ = ['Molspace',
            'DocExamples',
