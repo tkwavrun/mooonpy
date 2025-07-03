@@ -14,9 +14,9 @@ from pathlib import Path as StdPath
 # Run pytest tests
 print("=== NOT Running Tests ===\n")
 print("To run the pytest tests, use:")
-print("   Command: pytest test_Path.py -v")
-print("   Command: pytest test_Path.py::TestPath::test_path_creation -v  # Run specific test")
-print("   Command: pytest test_Path.py::TestSmartOpen -v  # Run specific test class")
+print("   Command: pytest test_path.py -v")
+print("   Command: pytest test_path.py::TestPath::test_path_creation -v  # Run specific test")
+print("   Command: pytest test_path.py::TestSmartOpen -v  # Run specific test class")
 print()
 
 class TestPath:

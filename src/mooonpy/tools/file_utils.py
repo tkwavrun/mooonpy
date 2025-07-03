@@ -111,7 +111,8 @@ class Path(str):
             >>> print(MyDir / MyFile)
             'Project\\Monomers\\DETDA.mol'
         """
-        return Path(os.path.join(self, other))
+        # return Path(os.path.join(self, other)) # does not work in Linux or Mac
+        return Path(os.path.join(str(self), str(other))) # fixes
 
     def __bool__(self) -> bool:
         """
