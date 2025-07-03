@@ -5,3 +5,4 @@ sphinx-book-theme
 pydata-sphinx-theme
 ghp-import
 matplotlib
+scipy
