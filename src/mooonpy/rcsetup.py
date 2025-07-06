@@ -45,7 +45,9 @@ _defaults = {'molspace.read.dsect': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'I
              
              'thermospace.read': 'all',
              
-             'xrdspace.read': 'all'
+             'xrdspace.read': 'all',
+
+             'OVITO':'C:\\Program Files\\OVITO Basic\\ovito.exe',
 }
 
 rcParams = RCParams(_defaults)
