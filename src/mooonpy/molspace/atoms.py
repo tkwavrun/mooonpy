@@ -41,16 +41,3 @@ class Atoms(dict):
             atom.y = pos_y
             atom.z = pos_z
         return
-
-    def get_fractional(self) -> Dict[int, Tuple[float, float, float]]:
-        """
-        Returns dictionary of {atomID:(ux,uy,uz)} fractional atom positions
-
-        .. seealso:: box.get_transformation_matrix, box.pos2frac
-        """
-        out = {}
-        h, h_inv, boxlo, boxhi = self.box.get_transformation_matrix()
-        for id_, atom in self.items():
-            frac = self.box.pos2frac(atom.x, atom.y, atom.z, h_inv, boxlo)
-            out[id_] = frac
-        return out

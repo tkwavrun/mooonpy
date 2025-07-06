@@ -13,6 +13,7 @@ July 5, 2025
 """
 from typing import Union, Optional, List, Tuple
 
+
 class Box:
     """
     Class representing a restricted triclimic simulation box as described in LAMMPS docs.
@@ -23,21 +24,22 @@ class Box:
     ..todo::
         - read in from general triclinic to restricted
     """
-    def __init__(self,**kwargs):
+
+    def __init__(self, **kwargs):
         self.xlo: float = -0.5
-        self.xhi: float =  0.5
+        self.xhi: float = 0.5
         self.ylo: float = -0.5
-        self.yhi: float =  0.5
+        self.yhi: float = 0.5
         self.zlo: float = -0.5
-        self.zhi: float =  0.5
+        self.zhi: float = 0.5
         self.yz: float = 0.0
         self.xz: float = 0.0
         self.xy: float = 0.0
 
         for key, value in kwargs.items():
             setattr(self, key, value)
-        
-    def get_lengths(self) -> Tuple[float,float,float]:
+
+    def get_lengths(self) -> Tuple[float, float, float]:
         """
         Compute box lengths from box edges.
 
@@ -48,8 +50,8 @@ class Box:
         ly = self.yhi - self.ylo
         lz = self.zhi - self.zlo
         return lx, ly, lz
-    
-    def get_transformation_matrix(self) -> Tuple[list[float],list[float],list[float],list[float]]:
+
+    def get_transformation_matrix(self) -> Tuple[list[float], list[float], list[float], list[float]]:
         """
         Generate transformation matrix to convert to and from fractional 
         or Cartesian coordinates using LAMMPS "sparse matrix" setup.
@@ -69,21 +71,21 @@ class Box:
         :rtype: Tuple[List[float],List[float],List[float],List[float]]
         """
         lx, ly, lz = self.get_lengths()
-        h = [lx, ly, lz, self.yz, self.xz, self.xy] 
-        h_inv = 6*[0]
-        h_inv[0] = 1/h[0]
-        h_inv[1] = 1/h[1]
-        h_inv[2] = 1/h[2]
-        h_inv[3] = -h[3] / (h[1]*h[2])
-        h_inv[4] = (h[3]*h[5] - h[1]*h[4]) / (h[0]*h[1]*h[2])
-        h_inv[5] = -h[5] / (h[0]*h[1])
-        
+        h = [lx, ly, lz, self.yz, self.xz, self.xy]
+        h_inv = 6 * [0]
+        h_inv[0] = 1 / h[0]
+        h_inv[1] = 1 / h[1]
+        h_inv[2] = 1 / h[2]
+        h_inv[3] = -h[3] / (h[1] * h[2])
+        h_inv[4] = (h[3] * h[5] - h[1] * h[4]) / (h[0] * h[1] * h[2])
+        h_inv[5] = -h[5] / (h[0] * h[1])
+
         # General box parameters
         boxlo = [self.xlo, self.ylo, self.zlo]
         boxhi = [self.xhi, self.yhi, self.zhi]
         return h, h_inv, boxlo, boxhi
 
-    def pos2frac(self, x, y, z, h_inv, boxlo)->Tuple[float, float, float]:
+    def pos2frac(self, x, y, z, h_inv, boxlo) -> Tuple[float, float, float]:
         """
         Convert cartesian to fractional coords (0-1) for one atom
 
@@ -116,7 +118,7 @@ class Box:
         frac_z = h_inv[2] * dz
         return frac_x, frac_y, frac_z
 
-    def frac2pos(self, frac_x, frac_y, frac_z, h, boxlo)->Tuple[float, float, float]:
+    def frac2pos(self, frac_x, frac_y, frac_z, h, boxlo) -> Tuple[float, float, float]:
         """
         Convert fractional (0-1) to cartesian coords for one atom
 
