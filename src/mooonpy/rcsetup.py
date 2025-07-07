@@ -5,9 +5,26 @@
 from collections.abc import MutableMapping
 
 
+# import matplotlib
+# matplotlib.use('Qt5Agg')
+# import matplotlib.pyplot as plt
+# plt.rcParams["font.family"] = "Arial"
+# plt.rcParams["font.weight"] = "bold"
+# plt.rcParams['axes.titleweight'] = "bold"
+# plt.rcParams['figure.titleweight'] = "bold"
+# plt.rcParams['axes.labelweight'] = "bold"
+# plt.rcParams['figure.dpi'] = 163
+# plt.rcParams['figure.figsize'] = (15,8.43)
+
+
 # Matplotlib GitHub:
 #    https://github.com/matplotlib/matplotlib/blob/main/lib/matplotlib/rcsetup.py
 #    https://github.com/matplotlib/matplotlib/blob/main/lib/matplotlib/__init__.py
+# Names:
+#  rc = runtime configure
+#  rcPhase
+#  rcParams
+#  rcDefaults
 class RCParams(MutableMapping):
     def __init__(self, defaults):
         self._params = dict(defaults)
@@ -45,7 +62,9 @@ _defaults = {'molspace.read.dsect': ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'I
              
              'thermospace.read': 'all',
              
-             'xrdspace.read': 'all'
+             'xrdspace.read': 'all',
+             
+             'guis.size': 'large'
 }
 
 rcParams = RCParams(_defaults)
