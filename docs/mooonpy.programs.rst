@@ -14,4 +14,4 @@ Submodules
 
    mooonpy.programs.hw
    mooonpy.programs.program
-   mooonpy.programs.regression_fringe_responce
+   mooonpy.programs.regression_fringe_response

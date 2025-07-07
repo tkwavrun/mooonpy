@@ -23,10 +23,9 @@ Submodules
    mooonpy.molspace.atom_styles
    mooonpy.molspace.atoms
    mooonpy.molspace.box
+   mooonpy.molspace.distance
    mooonpy.molspace.doc_examples
    mooonpy.molspace.force_field
-   mooonpy.molspace.hw
-   mooonpy.molspace.mc
    mooonpy.molspace.molspace
    mooonpy.molspace.periodic_table
    mooonpy.molspace.topology
