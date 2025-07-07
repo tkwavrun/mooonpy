@@ -3,6 +3,7 @@ from . import _files_io as _files_io
 from .atoms import Atoms
 from .topology import Bonds, Angles, Dihedrals, Impropers
 from .force_field import ForceField
+from .distance import *
 from ..rcsetup import rcParams
 import os
 
@@ -16,6 +17,7 @@ class Molspace(object):
       * Full namespace syntax    : ``mooonpy.molspace.molspace.Molspace()``
       * Aliased namespace syntax : ``mooonpy.Molspace()``
     """
+
     def __init__(self, filename='', **kwargs):
         """        
         Initialization Parameters
@@ -53,17 +55,17 @@ class Molspace(object):
             matrix is ``2*N``, with `N` the number of biquad sections
             of the desired system.
         """
-        
-        #print(rcParams)
-        
+
+        # print(rcParams)
+
         # Get some basic config options from kwargs or setup defaults
-        #print(kwargs)
-        
+        # print(kwargs)
+
         self.astyles = kwargs.pop('astyles', rcParams['molspace.astyles'])
         self.dsect = kwargs.pop('dsect', rcParams['molspace.read.dsect'])
-        
-        #print(kwargs)
-        
+
+        # print(kwargs)
+
         # Build this object with some composition
         self.atoms: Atoms = Atoms(self.astyles)
         self.bonds: Bonds = Bonds()
@@ -78,33 +80,40 @@ class Molspace(object):
         if filename:
             if not self.filename:
                 pass
-            
+
             if not os.path.exists(filename):
                 raise FileNotFoundError(f'{filename} was not found or is a directory')
-            
-            self.read_files(filename, dsect=self.dsect) 
-            
-    
-        #keys = self.bonds
 
-                
-        
+            self.read_files(filename, dsect=self.dsect)
 
-        
+            # keys = self.bonds
+
     def read_files(self, filename, dsect=['all']):
-        root, ext = os.path.splitext(filename)     
+        root, ext = os.path.splitext(filename)
         if filename.endswith('.data'):
             if 'all' in dsect:
                 dsect = ['Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers', 'Velocities']
             _files_io.read_lmp_data.read(self, filename, dsect)
-            
+
         return None
-    
+
     def write_files(self, filename, atom_style='full'):
-        root, ext = os.path.splitext(filename)     
+        root, ext = os.path.splitext(filename)
         if filename.endswith('.data'):
             _files_io.write_lmp_data.write(self, filename, atom_style)
         if filename.endswith('.ff.script'):
             _files_io.write_lmp_ff_script.write(self, filename)
-        
-        
+
+    def compute_pairs(self, cutoff, whitelist=None, blacklist=None, algorithm='DD_13', periodicity='ppp'):
+        """
+        Compute pairwise distances within cutoff between atoms
+        """
+        if algorithm == 'DD_13':
+            domains, fractionals = domain_decomp_13(self.atoms, cutoff, whitelist, blacklist, periodicity)
+            pairs = pairs_from_domains(self.atoms, cutoff, domains, fractionals)
+        else:
+            raise ValueError('Algorithm must be DD_13')
+
+        return domains, pairs
+
+    # def compute_bond_length(self,whitelist=None, blacklist=None, algorithm='DD_13', periodicity='ppp'):

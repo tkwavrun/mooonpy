@@ -7,16 +7,81 @@ import os
 from typing import List, Optional, Union
 
 class Path(str):
-    ## I think topofile is OK for instances of path objects, but a more general word should be used to avoid mangling and add precision
-    ## __init__ is immutable for string
     """
-    As computational scientists, half our jobs is file management and manipulation,
+    *As computational scientists, half our jobs is file management and manipulation,
     the Path class contains several aliases for the os.path and glob.glob modules
     to make processing data easier. All mooonpy functions internally use this class
-    for inputs of files or folders. Relevant strings are converted to path on entering functions
+    for inputs of files or folders. Relevant strings are converted to path on entering functions*
 
-    Not sure what class level docs should look like.
-    I'll fill out the methods for now
+    Examples
+    --------
+    A copy of the code used in these examples is avalible in root\\mooonpy\\examples\\tools\\path_utils\\example_Path.py
+
+    **Basic Path Operations**
+        >>> project_path = Path('Project/Data/Analysis')
+        >>> filename = Path('results.txt')
+        >>> full_path = project_path / filename
+        >>> print(full_path)
+        Project\\Data\\Analysis\\results.txt
+        >>> print(abs(full_path))
+        root\\mooonpy\\examples\\tools\\path_utils\\Project\\Data\\Analysis\\results.txt
+
+    **Path Parsing**
+        >>> sample_path = Path('experiments/run_001/data.csv.gz')
+        >>> print(sample_path.dir())
+        experiments\\run_001
+        >>> print(sample_path.basename())
+        data.csv.gz
+        >>> print(sample_path.root())
+        data.csv
+        >>> print(sample_path.ext())
+        .gz
+
+    **Extension Manipulation**
+        >>> data_file = Path('analysis/results.txt')
+        >>> print(data_file.new_ext('.json'))
+        analysis\\results.json
+        >>> print(data_file.new_ext('.txt.gz'))
+        analysis\\results.txt.gz
+
+    **File Existence**
+        >>> current_file = Path(__file__)
+        >>> fake_file = Path('nonexistent.txt')
+        >>> print(bool(current_file))
+        True
+        >>> print(bool(fake_file))
+        False
+
+    **Wildcard Matching**
+        >>> txt_pattern = Path('temp_dir/*.txt')
+        >>> print(txt_pattern.matches())
+        ['test1.txt', 'test2.txt']
+        >>> for file in Path('temp_dir/*'):
+        ...     print(file.basename())
+        data.csv
+        readme.md
+        test1.txt
+        test2.txt
+
+    **Recent File Finding**
+        >>> pattern = Path('temp_dir/*.txt')
+        >>> print(pattern.recent())
+        newest_file.txt
+        >>> print(pattern.recent(oldest=True))
+        old_file.txt
+
+    **Smart File Opening**
+        >>> mypath = Path('data.txt')
+        >>> with mypath.open('w') as f:
+        ...     f.write('Hello World')
+        # Creates regular file
+        >>> compressed_path = Path('data.txt.gz')
+        >>> # compressed_path.open() would use gzip automatically
+        # Would automatically handle gzip compression
+        ** Absolute Path Conversion **
+        >>> rel_path = Path('data/file.txt')
+        >>> print(abs(rel_path))
+        root\\mooonpy\\examples\\tools\\path_utils\\data\\file.txt
 
     .. TODO::
         __truediv__ __bool__ __abs__ and __iter__ docstrings in config?
@@ -46,7 +111,8 @@ class Path(str):
             >>> print(MyDir / MyFile)
             'Project\\Monomers\\DETDA.mol'
         """
-        return Path(os.path.join(self, other))
+        # return Path(os.path.join(self, other)) # does not work in Linux or Mac
+        return Path(os.path.join(str(self), str(other))) # fixes
 
     def __bool__(self) -> bool:
         """
@@ -78,7 +144,7 @@ class Path(str):
         :rtype: Path
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyFile = Path('DETDA.mol')
             >>> print(abs(MyFile))
             'C:\\Users\\You\\Desktop\\DETDA.mol'
@@ -97,7 +163,7 @@ class Path(str):
         before passing into a function if this causes issues.
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyWildcard = Path('*.mol')
             >>> for MyMatch in MyWildcard:
             >>>     print(MyMatch)
@@ -116,7 +182,7 @@ class Path(str):
         :rtype: Path
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyPath = Path('Project/Monomers/DETDA.mol')
             >>> print(MyPath.basename())
             'DETDA.mol'
@@ -133,7 +199,7 @@ class Path(str):
         :rtype: Path
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyPath = Path('Project/Monomers/DETDA.mol')
             >>> print(MyPath.dir())
             'Project\\Monomers'
@@ -150,7 +216,7 @@ class Path(str):
         :rtype: Path
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyPath = Path('Project/Monomers/DETDA.mol')
             >>> print(MyPath.ext())
             '.mol'
@@ -165,7 +231,7 @@ class Path(str):
         :rtype: List[Path]
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyWildcard = Path('*.mol')
             >>> print(Path.matches(MyWildcard))
             [Path('DETDA.mol'), Path('DEGBF.mol')]
@@ -183,7 +249,7 @@ class Path(str):
         :rtype: Path
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyPath = Path('Project/Monomers/DETDA.mol')
             >>> print(MyPath.new_ext('.data'))
             'Project/Monomers/DETDA.data'
@@ -194,8 +260,6 @@ class Path(str):
         """
         Open path with smart_open
 
-        :param filename: Path to file
-        :type filename: Path or str
         :param mode: Open mode, usually 'r' or 'a'
         :type mode: str
         :param encoding: File encoding
@@ -204,8 +268,9 @@ class Path(str):
         :rtype: File Object
 
         :Example:
-            >>> from mooonpy.tools import smart_open
-            >>> MyFileObj = smart_open('Project/Monomers/DETDA.data.gz')
+            >>> from mooonpy import Path
+            >>> MyPath = Path('Project/Monomers/DETDA.mol')
+            >>> MyFileObj = MyPath.open(mode='r')
 
         """
         return smart_open(self, mode, encoding)
@@ -220,7 +285,7 @@ class Path(str):
         :rtype: Path
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyWildcard = Path('Template_*.lmpmol')
             >>> print(Path.recent())
             'Template_1_v10_final_realthistime.lmpmol'
@@ -249,7 +314,7 @@ class Path(str):
         :rtype: Path
 
         :Example:
-            >>> from mooonpy.tools import Path
+            >>> from mooonpy import Path
             >>> MyPath = Path('Project/Monomers/DETDA.mol')
             >>> print(MyPath.root())
             'DETDA'
@@ -273,7 +338,7 @@ def smart_open(filename, mode='r', encoding='utf-8'):
 
     :param filename: Path to file
     :type filename: Path or str
-    :param mode: Open mode, usually 'r' or 'a'
+    :param mode: Open mode, usually 'r', 'w' or 'a'
     :type mode: str
     :param encoding: File encoding
     :type encoding: str
@@ -281,36 +346,18 @@ def smart_open(filename, mode='r', encoding='utf-8'):
     :return: opened file as object
     :rtype: File Object
     :Example:
-        >>> from mooonpy.tools import smart_open
+        >>> from mooonpy.tools.file_utils import smart_open
         >>> MyFileObj = smart_open('Project/Monomers/DETDA.data.gz')
     """
     try:
         if '.gz' in filename:
-            return gzip.open(filename, mode + 't', encoding=encoding)
+            return gzip.open(str(filename), mode + 't', encoding=encoding)
         elif '.bz2' in filename:
-            return bz2.open(filename, mode + 't', encoding=encoding)
+            return bz2.open(str(filename), mode + 't', encoding=encoding)
         elif '.xz' in filename or '.lzma' in filename:
-            return lzma.open(filename, mode + 't', encoding=encoding)
+            return lzma.open(str(filename), mode + 't', encoding=encoding)
     except:
+
         pass  # compressed filename did not work
-    return open(filename, mode, encoding=encoding)  # try regular read
+    return open(str(filename), mode, encoding=encoding)  # try regular read
 
-if __name__ == '__main__':
-    ## This is a stand in for a unit test
-    print('Testing __main__')
-    ThisPath = Path(__file__)  # this will depend on load or execution path?
-    print(ThisPath, bool(ThisPath))
-
-    MyWild = Path('../../../examples/EPON_862/*_merged.data')
-    print(MyWild)
-    MyWild = abs(MyWild)
-    print(MyWild)
-    for match in MyWild:
-        print(match)
-    print()
-    print(bool(match), match)
-    print(match.dir())
-    print(match.basename())
-    print(match.root())
-    print(match.ext())
-    print(match.new_ext('.mol'))

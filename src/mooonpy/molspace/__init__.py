@@ -5,8 +5,6 @@ __all__ = ['atoms',
            'box',
            'doc_examples',
            'graph_theory',
-           'hw',
-           'mc',
            'molspace',
            'force_field'
 ]
