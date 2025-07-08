@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
+from dataclasses import dataclass
 
 from .atoms import Atoms
+from ..tools.math_utils import MixingRule
 import math
 
-
+@dataclass
 class Domain(list):
     """
     Class to contain atoms within a domain as a list of atom IDs
@@ -19,13 +21,50 @@ class Domain(list):
         self.z: float = 0.0
         self.neighbors: dict = {}
 
-
+@dataclass
 class Pair():
     def __init__(self, dx, dy, dz, distance):
         self.dx: float = dx
         self.dy: float = dy
         self.dz: float = dz
         self.distance: float = distance
+
+class Pairs(dict):
+    def __init__(self,from_dict=None,to_dict=None):
+        if from_dict is None:
+            super(Pairs, self).__init__()
+        else:
+            super(Pairs, self).__init__(from_dict)
+
+    def update_bonds(self,bonds, vect=True,ignore_missing=False):
+        """
+        Update Bonds with length attribute computed from pair interactions
+
+        :param bonds: Bonds object to update
+        :type bonds: Bonds
+        :param vect: If True, updates bond.vect, may be disabled for speed
+        :type vect: bool
+        """
+        for key, bond in bonds.items():
+            try:
+                pair = self[key]
+                bond.dist = pair.distance
+                if vect:
+                    bond.vect = (pair.dx, pair.dy, pair.dz)
+            except:
+                if not ignore_missing:
+                    raise KeyError('Bond has no matching key in Pairs, length exceeded or it may not exist')
+
+    def filter_cutoff(self, atoms=None, bonds=None, cutoff=None, mode=None):
+        """
+        Return modified Pairs list after rule, may also update atoms or bonds
+        """
+
+        if not isinstance(atoms, Atoms):
+            raise TypeError('atoms must be a Atoms object')
+
+
+
 
 
 def pairs_from_domains(atoms, cutoff, domains, fractionals):
@@ -34,7 +73,8 @@ def pairs_from_domains(atoms, cutoff, domains, fractionals):
     box = atoms.box
     h, h_inv, boxlo, boxhi = box.get_transformation_matrix()
 
-    pairs = {}
+    # pairs = {}
+    pairs = Pairs()
     cutoff_pow2 = cutoff * cutoff
 
     for box_index, domain in domains.items():  # this can be parallelized
@@ -60,14 +100,15 @@ def pairs_from_domains(atoms, cutoff, domains, fractionals):
                         dx = Atom_B.x - pos_x
                         dy = Atom_B.y - pos_y
                         dz = Atom_B.z - pos_z
-                    elif atom_A > atom_B:  # reverse vector
+                        key = (atom_A, atom_B)
+                    else:  # reverse vector
                         dx = pos_x - Atom_B.x
                         dy = pos_y - Atom_B.y
                         dz = pos_z - Atom_B.z
+                        key = (atom_B, atom_A)
                     distance2 = dx * dx + dy * dy + dz * dz
                     if distance2 < cutoff_pow2:
-                        key = sorted([atom_A, atom_B])
-                        pairs[tuple(key)] = Pair(dx, dy, dz, math.sqrt(distance2))
+                        pairs[key] = Pair(dx, dy, dz, math.sqrt(distance2))
     return pairs
 
 
@@ -123,8 +164,8 @@ def domain_decomp_13(atoms, cutoff, whitelist=None, blacklist=None, periodicity=
     domains = defaultdict(Domain)
 
     for id_, atom in atoms.items():
-        if whitelist is not None and id_ in whitelist:
-            pass
+        if whitelist is not None and id_ not in whitelist:
+            continue
         elif blacklist is not None and id_ in blacklist:
             continue
 
@@ -165,11 +206,11 @@ def domain_decomp_13(atoms, cutoff, whitelist=None, blacklist=None, periodicity=
                     neighbor_index.append(n_i - 1)  # go to top
                     image_shift.append(1)  # add 1 box length in this direction when comparing
 
-                elif shifted >= n_i:
+                else: # shifted >= n_i:
                     neighbor_index.append(0)  # go to bottom
                     image_shift.append(-1)  # subtract 1 box length
-                else:
-                    raise Exception(f'Something went wrong, this should be unreachable')
+                # else:
+                #     raise Exception(f'Something went wrong, this should be unreachable')
 
             else:  # Skipped by break if non-periodic
                 neighbor_index = tuple(neighbor_index)

@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
 
+"""
+..note:: the keys usef for all of these classes use the ordering rules below,
+    so only 1 permutation is saved or searched for, and the original order is saved in the 'ordered' attribute,
+        - Bonds: key = (id1, id2) # id1 < id2
+        - Angles: key = (id1, id2, id3) # id1 < id3
+        - Dihedrals: key = (id1, id2, id3, id4) # id1 < id4
+        - Impropers: key = (id1, id2, id3, id4) # id1 < id3 < id4 # center atom is always id2, sort others
 
+..TODO:: methods for safe lookup and __set__ with autocorrected order - 7-Jul-25
+
+"""
 
 
 def _make_class(class_name, slots, defaults=None):

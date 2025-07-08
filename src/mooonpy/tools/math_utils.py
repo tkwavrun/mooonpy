@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+
 import numpy as np
 from scipy.signal import find_peaks
 
@@ -242,3 +244,51 @@ def first_value_cross(xdata: Array1D, ydata: Array1D, cross: Optional[Number] = 
         cross = np.mean(ydata)
     x_cross = xdata[np.min(np.where(ydata < cross)[0])]
     return x_cross
+
+class MixingRule():
+    def __init__(self, style='add'):
+        """
+        Initialize the mixing rule with a specific method name.
+
+        :param style: The name of the addition method to use
+        """
+        self.style = style.lower()
+
+        self._method_map = {
+            'add': self._arithmetic,
+            'diameter': self._diameter,
+            'arithmetic': self._arithmetic,
+            'geometric': self._geometric,
+            'sixth_epsilon': self._sixth_epsilon,
+            'sixth_sigma': self._sixth_sigma,
+        }
+    def __call__(self,*args, **kwargs):
+        return self._method_map[self.style](*args, **kwargs)
+
+    def _add(self,*args):
+        return sum(args)
+
+    def _diameter(self,*args):
+        return sum(args)/2
+
+    def _arithmetic(self,*args):
+        return sum(args)/len(args)
+
+    def _geometric(self,*args):
+        return np.power(np.prod(args),1/len(args))
+
+    def _sixth_epsilon(self,*args):
+        """
+        LAMMPS mix sixthpower function for epsilon.
+        Assumes ep1, sig1 ep2, sig2 ordering
+        """
+        return 2*np.sqrt(args[0],args[2])*args[1]**3*args[3]**3/(args[1]**6+args[3]**6)
+    def _sixth_sigma(self,*args):
+        if len(args) == 2:
+            sig1, sig2 = args
+        elif len(args) == 4: # order from above function
+            sig1 = args[1]
+            sig2 = args[3]
+        else:
+            raise Exception()
+        return np.power(0.5*(sig1**6+sig2**6),1/6)
