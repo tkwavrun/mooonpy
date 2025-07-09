@@ -53,6 +53,83 @@ class Thermospace(ColTable):
     @classmethod
     def basic_read(cls, file: Union[Path, str], silence_error_line: bool = False) -> 'Thermospace':
         return readlog_basic(file, silence_error_line=silence_error_line)
+    @classmethod
+    def txt_read(cls, file: Union[Path, str], silence_error_line: bool = False) -> 'Thermospace':
+        return readtxt_basic(file, silence_error_line=silence_error_line)
+
+def readtxt_basic(file: [Path, str], silence_error_line: bool = False) -> Thermospace:
+    """
+    Read a txt file as if it were a logfile into a Thermospace object
+    
+    :param file: path to a log file
+    :type file: [Path,str]
+    :param silence_error_line: silences error line and warnings if True (default False)
+    :type silence_error_line: bool
+    :return: Thermospace object
+    :rtype: Thermospace
+
+    :Example:
+        >>> import mooonpy
+        >>> file = mooonpy.Path('somepath.txt')
+        >>> MyLog = mooonpy.readtxt_basic(file)
+        >>> MyLog.csv(file.new_ext('.csv'))
+    Added thermospace compatability for LAMMPS fix/print output.
+
+    """
+    ## variables to return in thermospace
+    file = Path(file)
+    columns = {}
+    sections = {}
+    ## Setup for internal variables
+    has_nan = set()
+    keywords = []  # dummy
+    rowindex = 0  # starts at index 0
+    sectionID = 0
+    startrow = 0  # dummy
+    data_flag = True
+    interrupt_flag = False
+    header_flag = True
+
+    if not file:
+        raise Exception(f'File {file} not found')
+    with file.open('r') as f:
+        for line in f:
+            line = line.strip()
+            ## Read thermo section
+            if data_flag and not interrupt_flag:
+                splits = line.split()
+                if header_flag:
+                    header_flag = False
+                    keywords = splits
+                    sectionID += 1
+                    startrow = rowindex
+                    for key in keywords:
+                        if key not in columns:
+                            columns[key] = [None] * (rowindex)  ## init values for new columns, [] if rowcount is -1
+                else:  # table body
+                    if len(keywords) != len(splits):
+                        if not silence_error_line:
+                            print('File {:} legend does not match following data'.format(file))
+                        break
+                    for k, v in zip(keywords, splits):
+                        columns[k].append(v)  ## no string to float conversion, handled by numpy conversion later
+                    rowindex += 1  ## after in case anything fails
+            ## End thermo block
+        ## End read loop
+    ## End with statement
+    sections[sectionID] = range(startrow, rowindex + 1)
+    # ^ add section for last successful row, and increase final index by 1
+
+    for key, col in columns.items():  # convert string lists to array
+        nan = bool(key in has_nan)
+        columns[key] = _col_convert(col, nan)
+    if len(columns) == 0 and not silence_error_line:
+        warnings.warn(f'File {file} Contains no output data.')
+    out = Thermospace()  ## may change with init?
+    out.grid = columns
+    out.title = file
+    out.sections = sections
+    return out
 
 ## This should be refactored into _files_io but imports are being weird
 def readlog_basic(file: [Path, str], silence_error_line: bool = False) -> Thermospace:
@@ -98,6 +175,8 @@ def readlog_basic(file: [Path, str], silence_error_line: bool = False) -> Thermo
     data_flag = False
     interrupt_flag = False
     header_flag = True
+
+
 
     if not file:
         raise Exception(f'File {file} not found')

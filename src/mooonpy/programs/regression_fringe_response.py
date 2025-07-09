@@ -12,8 +12,9 @@ import matplotlib.pyplot as plt
 
 def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Optional[np.ndarray] = None,
                          trans_2: Optional[np.ndarray] = None, min_xhi: Optional[Number] = None,
-                         max_xhi: Optional[Number] = None, wn: Union[Number, str] = 'PSD', order: Number = 2,
-                         qm: str = 'msr', log: Optional[list] = None, plots: Union[str,List] = 'all') -> ProgramResults:
+                         max_xhi: Optional[Number] = None,  min_xlo: Optional[Number] = None, max_xlo: Optional[Number] = None, 
+                         wn: Union[Number, str] = 'PSD', order: Number = 2, qm: str = 'msr', 
+                         log: Optional[list] = None, plots: Union[str,List] = 'all') -> ProgramResults:
     """
     Implementation of the Regression Fringe Response Modulus Method Tensile Analysis.
 
@@ -115,7 +116,7 @@ def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Option
 
         # --------------------------------------------
         # Determine Linear region
-        lo, mid, hi, fr2_fringe, fr2_slopes = _forward_backward_forward(strain, stress_filt, min_xhi, max_xhi,
+        lo, mid, hi, fr2_fringe, fr2_slopes = _forward_backward_forward(strain, stress_filt, min_xhi, max_xhi, min_xlo, max_xlo,
                                                                         _plt_fbf=axies['plt_fbf'])
         results.lox = lo[0]
         results.loy = lo[1]
@@ -146,8 +147,16 @@ def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Option
         # Find yield
         # Step1: Compute the 2nd derivative from the end of the linear region to the max strain
         fr2_max_index = np.argmax(fr2_slopes)
-        reduced_fringe = fr2_fringe[fr2_max_index:-1]
-        reduced_slopes = fr2_slopes[fr2_max_index:-1]
+        # If both forward fringe slopes give the same strain (case of max_xhi met), compute yield from later on
+        if fr2_max_index == (len(fr2_slopes) - 1):
+            reduced_strain = strain[lo_index:-1]
+            reduced_stress = strain[lo_index:-1]
+            reduced_fringe, reduced_slopes  = compute_fringe_slope(reduced_strain, reduced_stress, 
+                                                                   min_strain=hi[0], max_strain=np.max(strain), 
+                                                                   direction='forward')
+        else:
+          reduced_fringe = fr2_fringe[fr2_max_index:-1]
+          reduced_slopes = fr2_slopes[fr2_max_index:-1]
         dstrain, dslopes1, dslopes2 = compute_derivative(reduced_fringe, reduced_slopes)
 
         results.dstrain = dstrain
@@ -169,7 +178,7 @@ def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Option
             yield_index = np.argmin(np.abs(strain - x_yield_d2))  # equivalent to .index
             x_yield = strain[yield_index]
             y_yield = stress_filt[yield_index]
-            # print('{:<50} {}'.format("Computed yield strength: ", y_yield))
+
             if axies['plt_peaks'] is not None:
                 axies['plt_peaks'].plot(xpeaks, ypeaks, 'g^', label='Peaks')
                 axies['plt_peaks'].plot(xvalleys, yvalleys, 'rv', label='Valleys')
@@ -227,6 +236,7 @@ def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Option
         results.log = log
         results.figs = figs
         results.axies = axies
+        plt.show()
         return results
 
     except:
@@ -299,7 +309,7 @@ def rfr_labeler(axies):
             pass
 
 
-def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None, maximize=True):
+def _forward_backward_forward(strain, stress, min_xhi=None, max_xhi=None, min_xlo=None, max_xlo=None, _plt_fbf=None):
     # --------------------------------------------------------
     # Compute the forward-backwards-forwards fringe response
     # --------------------------------------------------------
@@ -310,30 +320,33 @@ def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None, m
     if max_xhi is not None: max_strain_fr1 = max_xhi
     fr1_fringe, fr1_slopes = compute_fringe_slope(strain, stress, min_strain=min_strain_fr1,
                                                   max_strain=max_strain_fr1, direction='forward')
-    if maximize:
-        fr1_max_index = np.argmax(fr1_slopes)
-    else:
-        fr1_max_index = np.argmin(fr1_slopes)
+    fr1_max_index = np.argmax(fr1_slopes)
     fr1_max_slope = fr1_slopes[fr1_max_index]
     fr1_max_fringe = fr1_fringe[fr1_max_index]
 
     if _plt_fbf:
         _plt_fbf.plot(fr1_fringe, fr1_slopes, label='Forward 1')
         _plt_fbf.scatter(fr1_max_fringe, fr1_max_slope)
-
+    
     # Step2: First backwards response (br1 - applying minxhi and maxxhi accordingly)
     min_strain_br1 = min(strain)
     max_strain_br1 = fr1_max_fringe  # changed
     fr1_max_index_absolute = np.argmin(np.abs(strain - fr1_max_fringe))  # equivalent to .index
+    if min_xlo is not None: min_strain_br1 = min_xlo
+    if max_xlo is not None: max_strain_br1 = max_xlo
     reduced_strain = strain[0:fr1_max_index_absolute]
     reduced_stress = stress[0:fr1_max_index_absolute]
 
     br1_fringe, br1_slopes = compute_fringe_slope(reduced_strain, reduced_stress, min_strain=min_strain_br1,
                                                   max_strain=max_strain_br1, direction='reverse')
-    if maximize:
-        br1_max_index = np.argmax(br1_slopes)
-    else:
-        br1_max_index = np.argmin(br1_slopes)
+    
+    # Exception for when slope continuously decreases
+    try: br1_max_index = np.argmax(br1_slopes)
+    except:
+        print("RFR Wrongly Converged. Data does not have a best linear region... Skipping Reverse Fringe Slope.")
+        xmid = fr1_max_fringe
+        ymid = stress[fr1_max_index_absolute]
+        return (0, 0), (xmid, ymid), (xmid, ymid), fr1_fringe, fr1_slopes
     br1_max_slope = br1_slopes[br1_max_index]
     br1_max_fringe = br1_fringe[br1_max_index]
     br1_max_index_absolute = np.argmin(np.abs(strain - br1_max_fringe))  # equivalent to .index
@@ -343,16 +356,26 @@ def _forward_backward_forward(strain, stress, min_xhi, max_xhi, _plt_fbf=None, m
         _plt_fbf.scatter(br1_max_fringe, br1_max_slope)
 
     # Step3: Second forward response (fr2 - applying minxhi and maxxhi accordingly)
-    min_strain_fr2 = min_strain_fr1 + br1_max_fringe
-    max_strain_fr2 = max_strain_fr1 + br1_max_fringe
-    reduced_strain = strain[br1_max_index_absolute:-1]
-    reduced_stress = stress[br1_max_index_absolute:-1]
-    fr2_fringe, fr2_slopes = compute_fringe_slope(reduced_strain, reduced_stress, min_strain=min_strain_fr2,
-                                                  max_strain=max_strain_fr2, direction='forward')
-    if maximize:
-        fr2_max_index = np.argmax(fr2_slopes)
-    else:
-        fr2_max_index = np.argmin(fr2_slopes)
+    min_strain_fr2 = min_strain_fr1
+    max_strain_fr2 = max_strain_fr1
+    reduced_strain = strain[br1_max_index_absolute:fr1_max_index_absolute]
+    reduced_stress = stress[br1_max_index_absolute:fr1_max_index_absolute]
+
+    fr2_fringe, fr2_slopes = compute_fringe_slope(reduced_strain, reduced_stress, min_strain=None,
+                                                  max_strain=None, direction='forward') 
+
+    # Exception for when slope continuously decreases
+    try: fr2_max_index = np.argmax(fr2_slopes)
+    except:
+        print("RFR Wrongly Converged. Data does not have a best linear region... Skipping 2nd Forward Fringe Slope.")
+        xlo = br1_max_fringe
+        ylo = stress[br1_max_index_absolute]
+        xmid = fr1_max_fringe
+        ymid = stress[fr1_max_index_absolute]
+
+        plt.plot(br1_fringe, br1_slopes, label='Backward 1')
+        plt.scatter(br1_max_fringe, br1_max_slope)
+        return (xlo, ylo), (xmid, xmid), (xmid, ymid), fr1_fringe, fr1_slopes
     fr2_max_slope = fr2_slopes[fr2_max_index]
     fr2_max_fringe = fr2_fringe[fr2_max_index]
     fr2_max_index_absolute = np.argmin(np.abs(strain - fr2_max_fringe))  # equivalent to .index
