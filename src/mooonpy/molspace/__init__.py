@@ -3,10 +3,11 @@ import importlib
 
 __all__ = ['atoms',
            'box',
+           'distance',
            'doc_examples',
            'graph_theory',
            'molspace',
-           'force_field'
+           'force_field',
 ]
 
 for name in __all__:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from ...tools import file_utils
-from ...tools import string_utils
+from mooonpy.tools.file_utils import smart_open
+from mooonpy.tools.string_utils import string2digit
 
 
 def read(mol, filename, sections):
@@ -17,7 +17,7 @@ def read(mol, filename, sections):
                               'AngleAngle Coeffs']
     sections_fixes: list[str] = ['bond_react_props_internal']
 
-    # Setup the sets that will be used for parsing
+    # Set up the sets that will be used for parsing
     sections_all: set[str] = set(sections_mp + sections_tl + sections_ff + sections_xt + sections_fixes)
     sections_coeffs: set[str] = sections_ff + sections_xt
     sections_kwargs: set[str] = set(sections)
@@ -38,7 +38,7 @@ def read(mol, filename, sections):
     skip: int = 0
     section: str = ''
     ff_coeffs: None = None  # Will be a pointer to specifc ff_coeffs to update
-    with file_utils.smart_open(filename) as f:
+    with smart_open(filename) as f:
         f = f.readlines()
         for n, string in enumerate(f):
             # skip line between section keywords and "top of the body"
@@ -90,7 +90,7 @@ def read(mol, filename, sections):
 
             elif section == 'Bonds':
                 # nid = int(data_lst[0])
-                type_id = string_utils.string2digit(data_lst[1])  # This  could be a type label
+                type_id = string2digit(data_lst[1])  # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 ordered = [id1, id2]
@@ -104,7 +104,7 @@ def read(mol, filename, sections):
 
             elif section == 'Angles':
                 # nid = int(data_lst[0])
-                type_id = string_utils.string2digit(data_lst[1])  # This  could be a type label
+                type_id = string2digit(data_lst[1])  # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -114,13 +114,15 @@ def read(mol, filename, sections):
                 angle.ordered = ordered  # [id1, id2, id3]
                 angle.comment = comment
                 angle.type = type_id
-                if id1 < id3: key = tuple(ordered)
-                else: key = (id3, id2, id1)
+                if id1 < id3:
+                    key = tuple(ordered)
+                else:
+                    key = (id3, id2, id1)
                 mol.angles[key] = angle
 
             elif section == 'Dihedrals':
                 # nid = int(data_lst[0])
-                type_id = string_utils.string2digit(data_lst[1])  # This  could be a type label
+                type_id = string2digit(data_lst[1])  # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -131,13 +133,15 @@ def read(mol, filename, sections):
                 dihedral.ordered = ordered  # [id1, id2, id3, id4]
                 dihedral.comment = comment
                 dihedral.type = type_id
-                if id1 < id4: key = tuple(ordered)
-                else: key = (id4, id3, id2, id1)
+                if id1 < id4:
+                    key = tuple(ordered)
+                else:
+                    key = (id4, id3, id2, id1)
                 mol.dihedrals[key] = dihedral
 
             elif section == 'Impropers':
                 # nid = int(data_lst[0])
-                type_id = string_utils.string2digit(data_lst[1])  # This  could be a type label
+                type_id = string2digit(data_lst[1])  # This  could be a type label
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -168,7 +172,7 @@ def read(mol, filename, sections):
             # ff_coeffs build - if not one will be initialized here)
             elif section in sections_coeffs and ff_coeffs is not None:
                 # print(n, line, section)
-                digits = [string_utils.string2digit(string) for string in data_lst]
+                digits = [string2digit(string) for string in data_lst]
                 typeID = digits[0]
                 coeffs = digits[1:]
                 if typeID in ff_coeffs:
@@ -213,7 +217,7 @@ def read(mol, filename, sections):
 
             # -----------------------------------------------------------------#
             # Toggle between sections. Toggling is expensive:                 
-            #  - Requires each line to be check, which means every line in    
+            #  - Requires each line to be checked, which means every line in
             #    Atoms, Bond, ... etc needs to be checked                     
             #  - If we use wise if/elif settings, once the Atoms, Bonds, ...  
             #    etc sections have been found we do not have to check         

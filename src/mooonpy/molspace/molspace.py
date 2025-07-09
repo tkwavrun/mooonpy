@@ -3,8 +3,8 @@ from . import _files_io as _files_io
 from .atoms import Atoms
 from .topology import Bonds, Angles, Dihedrals, Impropers
 from .force_field import ForceField
-from .distance import *
-from ..rcsetup import rcParams
+from .distance import domain_decomp_13, pairs_from_bonds, pairs_from_domains
+from mooonpy.rcsetup import rcParams
 import os
 
 
@@ -116,4 +116,7 @@ class Molspace(object):
 
         return domains, pairs
 
-    # def compute_bond_length(self,whitelist=None, blacklist=None, algorithm='DD_13', periodicity='ppp'):
+    def compute_bond_length(self, periodicity='ppp'):
+        return pairs_from_bonds(self.atoms, self.bonds, 'ppp')
+
+

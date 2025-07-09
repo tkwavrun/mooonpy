@@ -2,9 +2,13 @@
 from collections import defaultdict
 from dataclasses import dataclass
 
+from molspace.topology import Bonds
+
 from .atoms import Atoms
-from ..tools.math_utils import MixingRule
+from .topology import Bonds
+# from ..tools.math_utils import MixingRule
 import math
+
 
 @dataclass
 class Domain(list):
@@ -21,6 +25,7 @@ class Domain(list):
         self.z: float = 0.0
         self.neighbors: dict = {}
 
+
 @dataclass
 class Pair():
     def __init__(self, dx, dy, dz, distance):
@@ -29,14 +34,15 @@ class Pair():
         self.dz: float = dz
         self.distance: float = distance
 
+
 class Pairs(dict):
-    def __init__(self,from_dict=None,to_dict=None):
+    def __init__(self, from_dict=None, to_dict=None):
         if from_dict is None:
             super(Pairs, self).__init__()
         else:
             super(Pairs, self).__init__(from_dict)
 
-    def update_bonds(self,bonds, vect=True,ignore_missing=False):
+    def update_bonds(self, bonds, vect=True, ignore_missing=False):
         """
         Update Bonds with length attribute computed from pair interactions
 
@@ -64,7 +70,61 @@ class Pairs(dict):
             raise TypeError('atoms must be a Atoms object')
 
 
+def pairs_from_bonds(atoms, bonds, periodicity='ppp'):
+    """
+    Compute pairs from bonds using minimum image convention
+    If bonds span more than half the box span in a periodic direction, the bond vector
+    """
+    if not isinstance(atoms, Atoms):
+        raise TypeError('atoms must be a Atoms object')
+    if not isinstance(bonds, Bonds):
+        raise TypeError('bonds must be a Bond object')
 
+    ## There may be a quicker way to do this, or one that works periodically for small cells
+    box = atoms.box
+    h, h_inv, boxlo, boxhi = box.get_transformation_matrix()
+    lx, ly, lz = box.get_lengths()
+
+    fractionals = {}
+    for id_, atom in atoms.items():
+        fractionals[id_] = box.pos2frac(atom.x, atom.y, atom.z, h_inv, boxlo)
+
+    pairs = Pairs()
+    for key, bond in bonds.items():
+        try:
+            f_A = fractionals[key[0]]
+            f_B = fractionals[key[1]]
+        except:
+            raise KeyError(f'Bond key {key} has no matching key in Atoms')
+        du_x = f_B[0] - f_A[0]
+        du_y = f_B[1] - f_A[1]
+        du_z = f_B[2] - f_A[2]
+        if periodicity[0] == 'p':
+            if du_x > 0.5:
+                du_x -= 1
+            elif du_x < -0.5:
+                du_x += 1
+        if periodicity[1] == 'p':
+            if du_y > 0.5:
+                du_y -= 1
+            elif du_y < -0.5:
+                du_y += 1
+        if periodicity[2] == 'p':
+            if du_z > 0.5:
+                du_z -= 1
+            elif du_z < -0.5:
+                du_z += 1
+
+        ## Transform fractional vector. not using function because no boxlo
+        dx = h[0] * du_x + h[5] * du_y + h[4] * du_z
+        dy = h[1] * du_y + h[3] * du_z
+        dz = h[2] * du_z
+
+        distance2 = dx * dx + dy * dy + dz * dz
+        pairs[key] = Pair(dx, dy, dz, math.sqrt(distance2))
+
+    pairs.update_bonds(bonds)  # update bond object
+    return pairs
 
 
 def pairs_from_domains(atoms, cutoff, domains, fractionals):
@@ -206,7 +266,7 @@ def domain_decomp_13(atoms, cutoff, whitelist=None, blacklist=None, periodicity=
                     neighbor_index.append(n_i - 1)  # go to top
                     image_shift.append(1)  # add 1 box length in this direction when comparing
 
-                else: # shifted >= n_i:
+                else:  # shifted >= n_i:
                     neighbor_index.append(0)  # go to bottom
                     image_shift.append(-1)  # subtract 1 box length
                 # else:

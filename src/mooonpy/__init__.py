@@ -17,6 +17,8 @@ from .rcsetup import rcParams
 
 __all__ = ['Molspace',
            'DocExamples',
+           'Thermospace',
+           'Path',
 ]
 
 
