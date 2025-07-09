@@ -4,7 +4,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from typing import Optional, Tuple, List, Dict
 
-from .string_utils import _col_convert
+from .string_utils import _col_convert, string2digit
 from .math_utils import aggregate_fun
 from .file_utils import Path
 
@@ -417,6 +417,49 @@ class ListListTable(Table):
                 return self.default
         raise Exception(f'ERROR: ListListTable row {row_key} and col {key} could not find a match or default')
 
+    @classmethod
+    def read_csv(cls, file: Path | str, header=True, rowlabels=False):
+        """
+        Read csv file into columns
+        """
+        file = Path(file)
+        file_obj = file.open(mode='r')
+        row_list = []
+        columns = None
+        corner = None
+        rows = []
+
+        try:
+            for ii, line in enumerate(file_obj):
+                line = line.strip()
+                splits = line.split(',')
+
+                if ii == 0:
+                    if header:
+                        if rowlabels:
+                            corner = splits[0].strip()
+                            columns = [key.strip() for key in splits[1:]]
+                            rows = []
+                            if columns[-1] == '':
+                                columns.pop(-1)  # remove trailing comma
+                        else:
+                            rows = None
+                        continue # no data
+
+                this_row = []
+                if rowlabels:
+                    rows.append(splits[0].strip())
+
+                    for value in splits[1:]:
+                        this_row.append(string2digit(value.strip()))
+                else:
+                    for value in splits:
+                        this_row.append(string2digit(value.strip()))
+                row_list.append(this_row)
+        except:
+            raise Exception(f'ERROR: CSV line {ii} :{line} could not read from {file}')
+
+        return ListListTable(from_listlist=row_list, cornerlabel=corner, rows=rows,collabels=columns)
 
 class ColTable(Table):
     def __init__(self, from_dict=None, rows=None, title=None, cornerlabel=None, default=...):
