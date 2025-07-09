@@ -4,10 +4,6 @@ from mooonpy.tools.string_utils import string2digit
 
 
 
-<<<<<<< HEAD
-    # Set up the sets that will be used for parsing
-    sections_all: set[str] = set(sections_mp + sections_tl + sections_ff + sections_xt + sections_fixes)
-=======
 def read(mol, filename, sections):
     
     # Define sections to read (using inputs from user if they pass them)
@@ -20,7 +16,6 @@ def read(mol, filename, sections):
     
     # Setup the sets that will be used for parsing
     sections_all:    set[str] = set(sections_mp + sections_tl + sections_ff + sections_xt + sections_fixes)
->>>>>>> parent of f4b6cd0 (Pairs class start and BADI key change)
     sections_coeffs: set[str] = sections_ff + sections_xt
     sections_kwargs: set[str] = set(sections)
     
@@ -42,13 +37,8 @@ def read(mol, filename, sections):
     # Open and read contents from file
     skip: int = 0
     section: str = ''
-<<<<<<< HEAD
-    ff_coeffs: None = None  # Will be a pointer to specifc ff_coeffs to update
-    with smart_open(filename) as f:
-=======
     ff_coeffs: None = None # Will be a pointer to specifc ff_coeffs to update
     with file_utils.smart_open(filename) as f:
->>>>>>> parent of f4b6cd0 (Pairs class start and BADI key change)
         f = f.readlines()
         for n, string in enumerate(f):
             # skip line between section keywords and "top of the body"
@@ -100,13 +90,8 @@ def read(mol, filename, sections):
                 atom.vz = vz
                 
             elif section == 'Bonds':
-<<<<<<< HEAD
-                # nid = int(data_lst[0])
-                type_id = string2digit(data_lst[1])  # This  could be a type label
-=======
                 #nid = int(data_lst[0])
                 type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
->>>>>>> parent of f4b6cd0 (Pairs class start and BADI key change)
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 ordered = (id1, id2)
@@ -118,13 +103,8 @@ def read(mol, filename, sections):
                 mol.bonds[ordered] = bond
                 
             elif section == 'Angles':
-<<<<<<< HEAD
-                # nid = int(data_lst[0])
-                type_id = string2digit(data_lst[1])  # This  could be a type label
-=======
                 #nid = int(data_lst[0])
                 type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
->>>>>>> parent of f4b6cd0 (Pairs class start and BADI key change)
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -134,23 +114,11 @@ def read(mol, filename, sections):
                 angle.ordered = list(ordered) #[id1, id2, id3]
                 angle.comment = comment
                 angle.type = type_id
-<<<<<<< HEAD
-                if id1 < id3:
-                    key = tuple(ordered)
-                else:
-                    key = (id3, id2, id1)
-                mol.angles[key] = angle
-
-            elif section == 'Dihedrals':
-                # nid = int(data_lst[0])
-                type_id = string2digit(data_lst[1])  # This  could be a type label
-=======
                 mol.angles[ordered] = angle
                 
             elif section == 'Dihedrals':
                 #nid = int(data_lst[0])
                 type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
->>>>>>> parent of f4b6cd0 (Pairs class start and BADI key change)
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -161,23 +129,11 @@ def read(mol, filename, sections):
                 dihedral.ordered = list(ordered) #[id1, id2, id3, id4]
                 dihedral.comment = comment
                 dihedral.type = type_id
-<<<<<<< HEAD
-                if id1 < id4:
-                    key = tuple(ordered)
-                else:
-                    key = (id4, id3, id2, id1)
-                mol.dihedrals[key] = dihedral
-
-            elif section == 'Impropers':
-                # nid = int(data_lst[0])
-                type_id = string2digit(data_lst[1])  # This  could be a type label
-=======
                 mol.dihedrals[ordered] = dihedral
                 
             elif section == 'Impropers':
                 #nid = int(data_lst[0])
                 type_id = string_utils.string2digit(data_lst[1]) # This  could be a type label
->>>>>>> parent of f4b6cd0 (Pairs class start and BADI key change)
                 id1 = int(data_lst[2])
                 id2 = int(data_lst[3])
                 id3 = int(data_lst[4])
@@ -205,13 +161,8 @@ def read(mol, filename, sections):
             # Read-in force field parameters (type labels might have already initialized a 
             # ff_coeffs build - if not one will be initialized here)
             elif section in sections_coeffs and ff_coeffs is not None:
-<<<<<<< HEAD
-                # print(n, line, section)
-                digits = [string2digit(string) for string in data_lst]
-=======
                 #print(n, line, section)
                 digits = [string_utils.string2digit(string) for string in data_lst]
->>>>>>> parent of f4b6cd0 (Pairs class start and BADI key change)
                 typeID = digits[0]
                 coeffs = digits[1:]
                 if typeID in ff_coeffs:
