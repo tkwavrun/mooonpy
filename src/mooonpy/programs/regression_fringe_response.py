@@ -201,7 +201,7 @@ def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Option
         # Find Poisson's
         redused_strain = strain[lo_index:yield_index + 1]
         if trans_1 is not None:
-            trans_1_filt, wn, qm = butter_lowpass(strain, trans_1)
+            trans_1_filt, wn, qm = butter_lowpass(strain, trans_1, wn=wn)
             reduced_trans_1 = trans_1_filt[lo_index:yield_index + 1]
             trans_1_coeff = polyfit(redused_strain, reduced_trans_1, 1)
             if axies['plt_trans'] is not None:
@@ -216,7 +216,7 @@ def RFR_tensile_analysis(strain: np.ndarray, stress: np.ndarray, trans_1: Option
         results.trans_1_poi = -trans_1_coeff[1]
 
         if trans_2 is not None:
-            trans_2_filt, wn, qm = butter_lowpass(strain, trans_2)
+            trans_2_filt, wn, qm = butter_lowpass(strain, trans_2, wn=wn)
             reduced_trans_2 = trans_2_filt[lo_index:yield_index + 1]
             trans_2_coeff = polyfit(redused_strain, reduced_trans_2, 1)
             if axies['plt_trans'] is not None:
