@@ -113,6 +113,32 @@ class Path(str):
         """
         # return Path(os.path.join(self, other)) # does not work in Linux or Mac
         return Path(os.path.join(str(self), str(other))) # fixes
+    
+    def __sub__(self, template: Union[str, 'Path']):
+        """
+        Returns value of glob wildcard (*) characters from a filename-template pair
+        
+        :param other: template with glob wildcards
+        :type template: str or Path with wildcards
+        :param self: Path or str without wildcards
+        :return: list of wildcards
+        :rtype: list
+
+        :Example:
+          >>> from mooonpy.tools import Path
+          >>> myfilename = Path('filename_step10_temp300.data')
+          >>> mytemplate = Path('filename_step*_temp*.data)
+          >>> print(myfilename - mytemplate)
+          ['10', '300']
+        """
+        # import built-in matching tools
+        import fnmatch, re
+
+        to_match = fnmatch.translate(str('*\\' + template)) # convert to regular expression
+        to_match = to_match.replace(".*", "(.*)") # allow capturable regrex
+        compiled = re.compile(to_match) # compile regrex string into object
+
+        return list(compiled.match(str(self)).groups())
 
     def __bool__(self) -> bool:
         """
